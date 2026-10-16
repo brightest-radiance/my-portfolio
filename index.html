@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kaustubh Niroula | AI engineer in progress</title>
 <meta name="description" content="Kaustubh Niroula is learning to build AI systems. Follow the 11-stage roadmap from Python to fine-tuning.">
-<script>document.documentElement.classList.add('js')</script>
+<script>document.documentElement.classList.add('js');(function(){var d=document.documentElement,m=matchMedia('(prefers-color-scheme:light)'),s=null;try{s=localStorage.getItem('kn-theme')}catch(e){}function a(){d.dataset.theme=s||(m.matches?'light':'dark')}a();if(m.addEventListener)m.addEventListener('change',a);window.__setTheme=function(t){s=t;try{localStorage.setItem('kn-theme',t)}catch(e){}a()}})()</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
@@ -115,6 +115,69 @@ h2{font-size:clamp(3.2rem,9vw,7.5rem);line-height:.88;letter-spacing:-.015em}
 .btn.pri:hover{background:var(--acc);color:var(--on-acc);filter:brightness(1.12)}
 footer{border-top:1px solid var(--line);padding:1.75rem 0 2.5rem;color:var(--mut);font-size:.9rem}
 
+.about{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:2rem 4rem;align-items:start}
+.bio p{margin:0 0 1.1rem;color:var(--mut);max-width:36rem}
+.bio .big{font:700 clamp(1.6rem,3vw,2.2rem)/1.15 var(--disp);color:var(--ink);max-width:none}
+.facts{display:grid;grid-template-columns:1fr 1fr;margin:2rem 0 0;border-top:1px solid var(--line)}
+.facts div{padding:1rem 1rem 1rem 0;border-bottom:1px solid var(--line)}
+.facts dt{color:var(--mut);font-size:.85rem}
+.facts dd{margin:.1rem 0 0;font-weight:600}
+button.btn{font:600 1rem var(--sys);background:none;cursor:pointer}
+:root{--tl:22%}
+:root[data-theme="light"]{--tl:86%}
+.sheet{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center}
+.sheet[hidden],.view[hidden],.tile[hidden]{display:none}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .45s}
+.sheet.open .scrim{opacity:1}
+.panel{position:relative;width:min(1000px,100%);height:min(92svh,860px);display:flex;flex-direction:column;background:color-mix(in srgb,var(--bg) 90%,transparent);-webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%);border:1px solid var(--line);border-bottom:0;border-radius:28px 28px 0 0;box-shadow:inset 0 1px 0 var(--edge),0 -20px 60px rgba(0,0,0,.35);transform:translateY(100%);transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.sheet.open .panel{transform:none}
+.sh-head{padding:.7rem clamp(1.25rem,4vw,2.5rem) 1.1rem;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+.grab{width:42px;height:5px;border-radius:99px;background:var(--line2);margin:.2rem auto .9rem}
+.sh-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.sh-head h2{font-size:clamp(2.2rem,5vw,3.2rem)}
+.x{width:40px;height:40px}
+.sh-body{flex:1;overflow:auto;overscroll-behavior:contain;padding:0 clamp(1.25rem,4vw,2.5rem) calc(2.5rem + env(safe-area-inset-bottom,0px))}
+.seg{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;padding:4px;border-radius:999px;background:var(--line)}
+.seg i{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:999px;background:var(--ink);transition:transform .5s cubic-bezier(.16,1,.3,1)}
+.seg[data-t="1"] i{transform:translateX(100%)}
+.seg button{position:relative;z-index:1;border:0;background:none;color:var(--ink);font:600 .92rem var(--sys);padding:.55rem 1.25rem;border-radius:999px;cursor:pointer;transition:color .3s}
+.seg button[aria-selected="true"]{color:var(--bg)}
+.feat{display:grid;grid-template-columns:120px 1fr;gap:1.4rem;padding:1.2rem;margin-bottom:1.25rem;background:var(--bg2);border:1px solid var(--line);border-radius:22px}
+.fl{display:flex;align-items:center;gap:.5rem;color:var(--mut);font-size:.9rem;font-weight:500}
+.ft{font-size:clamp(2rem,4.5vw,3rem);line-height:.95;margin:.4rem 0 .3rem}
+.fm{min-height:1.5em;margin:0 0 1rem;color:var(--mut)}
+.pb{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.pb i{display:block;height:100%;border-radius:99px;background:var(--acc);transform-origin:left;transition:transform 1.1s cubic-bezier(.16,1,.3,1)}
+.pn{display:flex;justify-content:space-between;align-items:baseline;margin-top:.55rem;font-size:.9rem;color:var(--mut)}
+.pn b{color:var(--ink);font:800 1.7rem/1 var(--disp)}
+.stat2{display:flex;align-items:center;gap:1rem;margin:0 0 1.25rem;color:var(--mut);font-size:.95rem}
+.stat2 b{color:var(--ink)}
+.stat2 .pb{flex:1;max-width:260px;height:4px}
+.tl{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;margin-bottom:1.5rem}
+.tl .chips{margin:0}
+.q{flex:1;min-width:160px;padding:.6rem 1rem;border-radius:999px;border:1px solid var(--line2);background:none;color:var(--ink);font:inherit;font-size:.92rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:1.1rem .9rem}
+.tile{display:block;text-align:left;padding:0;border:0;background:none;color:var(--ink);font:inherit;cursor:pointer;transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .3s}
+.tile:hover{transform:translateY(-4px)}
+.tile:active{transform:scale(.97);transition-duration:.1s}
+.tile[data-s="next"]{opacity:.7}
+.cvr{position:relative;display:block;aspect-ratio:2/3;border-radius:12px;overflow:hidden;background:var(--bg2)}
+.ci{position:absolute;inset:0;display:grid;place-items:center}
+.ci img{width:100%;height:100%;object-fit:cover}
+.ci.mono{background:hsl(var(--h) 16% var(--tl));place-items:end stretch}
+.nm{display:block;padding:.7rem;font:800 clamp(1.05rem,2.4vw,1.35rem)/.98 var(--disp);text-transform:uppercase;overflow-wrap:anywhere}
+.feat .nm{padding:.5rem;font-size:.95rem}
+.bd{position:absolute;left:.4rem;top:.4rem;z-index:1;padding:.12rem .5rem;border-radius:999px;background:var(--bg);color:var(--ink);font-size:.68rem;font-weight:600}
+.tile[data-s="now"] .bd{background:var(--acc);color:#fff}
+.tile[data-s="now"] .cvr{outline:2px solid var(--acc);outline-offset:3px}
+.tile[aria-pressed="true"] .cvr{outline:2px solid var(--ink);outline-offset:3px}
+.tt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:.55rem;color:var(--mut);font-size:.82rem;line-height:1.25}
+@media (prefers-reduced-transparency:reduce){.panel{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--bg2)}}
+.foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+footer a{color:var(--mut);text-decoration:none}
+footer a:hover{color:var(--ink)}
+@media (max-width:800px){.about{grid-template-columns:1fr}}
+@media (max-width:700px){.feat{grid-template-columns:88px 1fr;gap:1rem}.panel{height:94svh;border-radius:24px 24px 0 0}.grid{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.js .rv>span{transform:none}}
 @media (prefers-reduced-transparency:reduce){.glass{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--bg2)}}
 </style>
@@ -124,7 +187,7 @@ footer{border-top:1px solid var(--line);padding:1.75rem 0 2.5rem;color:var(--mut
 <header class="nav glass">
   <a class="brand" href="#top" aria-label="Kaustubh Niroula, top of page">KN</a>
   <nav class="row" aria-label="Main">
-    <span class="links row"><a href="#roadmap" data-s>Roadmap</a><a href="#approach" data-s>Approach</a><a href="#log" data-s>Build log</a></span>
+    <span class="links row"><a href="#about" data-s>About</a><a href="#roadmap" data-s>Roadmap</a><a href="#approach" data-s>Approach</a><a href="#log" data-s>Build log</a></span>
     <a class="cta" href="#contact">Contact</a>
     <button id="tg" class="tbtn" aria-label="Switch between dark and light theme"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
   </nav>
@@ -151,6 +214,19 @@ footer{border-top:1px solid var(--line);padding:1.75rem 0 2.5rem;color:var(--mut
     <div class="stat"><span class="num" data-count="1">0</span><span class="lab">In progress right now</span></div>
     <div class="stat"><span class="num" data-count="0">0</span><span class="lab">Projects shipped so far</span></div>
   </div>
+
+  <section class="sec" id="about">
+    <div class="w about">
+      <h2 class="rv"><span>About me</span></h2>
+      <div class="bio">
+        <p class="big">I'm Kaustubh, and I'm working toward becoming an AI engineer. I'm at the very beginning, and I'd rather say so plainly.</p>
+        <p>What pulls me in is the part after the demo: making a model work reliably, affordably, and safely for real people. That's why my plan includes deployment, evaluation, and monitoring, not only prompts.</p>
+        <p>This site keeps me honest. The roadmap shows what I intend to learn, and the build log will show what I actually finished.</p>
+        <dl class="facts"><div><dt>Focus</dt><dd>AI engineering</dd></div><div><dt>Stage</dt><dd>1 of 11, Python for AI</dd></div><div><dt>Goal</dt><dd>AI systems that work in production</dd></div><div><dt>Open to</dt><dd>Advice and study partners</dd></div></dl>
+        <div class="btns"><button class="btn" id="beyond" type="button" aria-haspopup="dialog">Beyond the code: games and books</button></div>
+      </div>
+    </div>
+  </section>
 
   <section class="sec" id="roadmap">
     <div class="w head">
@@ -182,18 +258,35 @@ footer{border-top:1px solid var(--line);padding:1.75rem 0 2.5rem;color:var(--mut
     <div class="w">
       <h2 class="rv"><span>Let's talk</span></h2>
       <p class="sub">Learning AI too, or have advice for someone at the start? I'd like to hear from you.</p>
-      <div class="btns"><a class="btn pri" href="#">Email me</a><a class="btn" href="#">GitHub</a><a class="btn" href="#">LinkedIn</a></div>
+      <div class="btns"><a class="btn pri" href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=kaustubhniroula15@gmail.com" target="_blank" rel="noopener">Email</a><a class="btn" href="https://github.com/brightest-radiance" target="_blank" rel="noopener">GitHub</a></div>
     </div>
   </section>
 </main>
-<footer><div class="w">&copy; 2026 Kaustubh Niroula</div></footer>
+<footer><div class="w foot"><span>&copy; 2026 Kaustubh Niroula</span><span class="row" style="gap:1.4rem"><a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=kaustubhniroula15@gmail.com" target="_blank" rel="noopener">Email</a><a href="https://github.com/brightest-radiance" target="_blank" rel="noopener">GitHub</a><a href="#top">Back to top</a></span></div></footer>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t" hidden>
+  <div class="scrim"></div>
+  <div class="panel">
+    <div class="sh-head">
+      <div class="grab" aria-hidden="true"></div>
+      <div class="sh-row">
+        <h2 id="sh-t">Beyond the code</h2>
+        <div class="row" style="gap:.7rem">
+          <div class="seg" role="tablist" aria-label="Choose games or books" data-t="0"><i aria-hidden="true"></i><button role="tab" data-k="games" aria-selected="true">Games</button><button role="tab" data-k="books" aria-selected="false">Books</button></div>
+          <button class="cb x" aria-label="Close"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+        </div>
+      </div>
+    </div>
+    <div class="sh-body"></div>
+  </div>
+</div>
 
 <script>
 (()=>{
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,cl=(v,a,b)=>Math.min(b,Math.max(a,v));
 const root=document.documentElement;
-$('#tg').onclick=()=>root.dataset.theme=root.dataset.theme==='light'?'dark':'light';
+$('#tg').onclick=()=>__setTheme(root.dataset.theme==='light'?'dark':'light');
 
 /* hero letters */
 $$('[data-split]').forEach(el=>{const t=el.textContent;el.textContent='';[...t].forEach((c,i)=>{const s=document.createElement('span');s.className='ch';s.setAttribute('aria-hidden','true');s.style.setProperty('--i',i+(+el.dataset.split));s.textContent=c;el.append(s)})});
@@ -236,6 +329,65 @@ cards.forEach((c,i)=>c.addEventListener('click',()=>{if(!swiped)go(i)}));
 pv.onclick=()=>go(idx-1);nx.onclick=()=>go(idx+1);
 chips.forEach(c=>c.onclick=()=>go(S.findIndex(s=>s[0]===+c.dataset.p)));
 addEventListener('resize',measure);measure();
+
+/* ===== GAMES AND BOOKS: edit these two lists whenever you like =====
+   t = title   s = "done" | "now" | "next"   p = progress 0-100 (for "now")   a = author   n = short note
+   Move a title between done(...) and next(...) as you finish things.
+   Covers load automatically from public sources. To fix a wrong or missing one, write that item as an object and add:
+   c:"https://...image.jpg" (direct image link), or w:"Exact Wikipedia article title" (search a different page),
+   or save your own image as covers/<title-in-lowercase-with-hyphens>.jpg (that file is checked first). */
+const COVER_EXT='jpg';
+const done=(...a)=>a.map(t=>({t,s:'done'})),next=(...a)=>a.map(t=>({t,s:'next'}));
+const G=[
+{t:"Resident Evil 4 Remake",s:"now",p:10,n:"Playing it now."},
+...done("Sifu","Spider-Man 2","Doom (2016)","Kingdom Come: Deliverance","A Plague Tale: Innocence","Horizon Zero Dawn","The Last of Us Part 1","007 First Light","Tainted Grail: Fall of Avalon","God of War Ragnarök","God of War (2018)","Elden Ring","Black Myth: Wukong","Kena: Bridge of Spirits","Grand Theft Auto V","Batman: Arkham Knight","Dark Souls","Dark Souls II","Dark Souls III","Sekiro: Shadows Die Twice","The Witcher 3: Wild Hunt","Minecraft","The Legend of Zelda: Breath of the Wild","Mad Max","Dragon Ball: Sparking! Zero","WWE 2K19","WWE 2K24","WWE 2K25","WWE 2K26","Tekken 8","Call of Duty: WWII","The Amazing Spider-Man 2","Ghost of Tsushima"),
+...next("Avatar: Frontiers of Pandora","Guardians of the Galaxy","Devil May Cry 5","Detroit: Become Human","Stellar Blade","Uncharted 4","Ratchet & Clank: Rift Apart","Returnal","Little Nightmares 1","Control","Senua's Saga: Hellblade II","Tomb Raider","Alan Wake 2","Assassin's Creed Unity","A Plague Tale: Requiem","Little Nightmares 2","Rise of the Tomb Raider","Watch Dogs","Star Wars Jedi: Fallen Order","Resident Evil Village","Hitman (2016)","Doom Eternal","Hogwarts Legacy","Quantum Break","Shadow of the Tomb Raider","Watch Dogs 2","Star Wars Jedi: Survivor","Silent Hill 2 Remake","Assassin's Creed Odyssey","Dragon's Dogma 2","Monster Hunter Wilds","Mafia: Definitive Edition","Doom: The Dark Ages","Horizon Forbidden West","Baldur's Gate 3","Death Stranding","The Last of Us Part 2","Red Dead Redemption 2","Oblivion Remake","Hollow Knight","Final Fantasy XVI","Metal Gear Solid Delta: Snake Eater","The Witcher 3: DLC and new update","Kingdom Come: Deliverance 2","Hollow Knight: Silksong","Final Fantasy VII Rebirth","Death Stranding 2","Assassin's Creed Valhalla","Yakuza: Like a Dragon","Like a Dragon: Infinite Wealth","Clair Obscur: Expedition 33","Until Then","Dispatch","Fallout 4","Ghost of Yotei","Lego Batman","Forza Horizon 6","Mouse P.I. For Hire","Pragmata","Assassin's Creed Black Flag Remake","Grand Theft Auto VI","The Legend of Zelda: Ocarina of Time Remastered")];
+const B=[
+{t:"Man's Search for Meaning",a:"Viktor E. Frankl",s:"now",p:30,n:"Reading it now."},
+...[["Babel","R. F. Kuang"],["The Alchemist","Paulo Coelho"],["The Fifth Mountain","Paulo Coelho"],["The Metamorphosis","Franz Kafka"],["The Art of War","Sun Tzu"],["Awa Maru: The Japanese Titanic",""],["Bhagavad Gita","Attributed to Vyasa"],["The Compound Effect","Darren Hardy"]].map(([t,a])=>({t,a,s:'done'})),
+{t:"The Brothers Karamazov",a:"Fyodor Dostoevsky",s:"next"}];
+
+const KIND={games:{list:G,now:'Playing now',lab:{done:'Finished',now:'Playing',next:'Backlog'},fin:'finished',ph:'Search games'},books:{list:B,now:'Reading now',lab:{done:'Read',now:'Reading',next:'Up next'},fin:'read',ph:'Search books'}};
+const RK={now:0,done:1,next:2};
+const slug=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const hue=t=>[...t].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
+const place=(el,it)=>{el.className='ci mono';el.dataset.t=it.t;el.style.setProperty('--h',hue(it.t));el.innerHTML=`<span class="nm">${it.t}</span>`};
+const loadImg=u=>new Promise(r=>{if(!u)return r(null);const im=new Image();im.onload=()=>r(im);im.onerror=()=>r(null);im.src=u});
+let cache={};try{cache=JSON.parse(localStorage.getItem('kn-cov')||'{}')}catch(e){}
+const J=u=>fetch(u).then(r=>r.json());
+async function lookup(it,k){if(cache[it.t])return cache[it.t];let u='';
+try{if(k==='books'){const au=it.a?'&author='+encodeURIComponent(it.a.split(' ').pop()):'';const d=await J(`https://openlibrary.org/search.json?title=${encodeURIComponent(it.t)}${au}&limit=5&fields=cover_i`);const h=(d.docs||[]).find(x=>x.cover_i);if(h)u=`https://covers.openlibrary.org/b/id/${h.cover_i}-L.jpg`}
+if(!u){const d=await J(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(it.w||it.t+(k==='games'?' video game':' book'))}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=500&format=json&origin=*`);const p=Object.values((d.query||{}).pages||{})[0];if(p&&p.thumbnail)u=p.thumbnail.source}}catch(e){}
+if(u){cache[it.t]=u;try{localStorage.setItem('kn-cov',JSON.stringify(cache))}catch(e){}}return u}
+async function cover(el,it,k){let im=await loadImg(it.c)||await loadImg(`covers/${slug(it.t)}.${COVER_EXT}`);if(!im)im=await loadImg(await lookup(it,k));if(im&&el.dataset.t===it.t){im.alt=it.t;el.className='ci';el.replaceChildren(im)}}
+const lazy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){lazy.unobserve(e.target);const d=e.target._d;cover(e.target,d.it,d.k)}}),{root:$('.sh-body'),rootMargin:'400px'});
+function countTo(el,p,off){if(off||RM||!p){el.textContent=off?'Not started':p+'%';return}const t0=performance.now();(function f(t){const k=Math.min((t-t0)/1000,1);el.textContent=(k<1?Math.round(p*(1-Math.pow(2,-10*k))):p)+'%';if(k<1)requestAnimationFrame(f)})(t0)}
+function build(k){const K=KIND[k],items=[...K.list].sort((a,b)=>RK[a.s]-RK[b.s]),el=document.createElement('section');el.className='view';el.hidden=true;
+const cnt=s=>items.filter(i=>s==='all'||i.s===s).length,dn=cnt('done');let nq=0,si=0,f='all',q='';
+el.innerHTML=`<div class="feat"><div class="cvr"><span class="ci"></span></div><div><div class="fl"></div><h3 class="ft"></h3><p class="fm"></p><div class="pb"><i></i></div><div class="pn"><span></span><b></b></div></div></div><p class="stat2"><span><b>${dn}</b> of ${items.length} ${K.fin}</span><span class="pb"><i style="transform:scaleX(${dn/items.length})"></i></span></p><div class="tl"><div class="chips">${['all','done','now','next'].map(s=>`<button class="chip" data-f="${s}" aria-pressed="${s==='all'}">${s==='all'?'All':K.lab[s]} ${cnt(s)}</button>`).join('')}</div><input class="q" type="search" placeholder="${K.ph}" aria-label="${K.ph}"></div><div class="grid">${items.map((it,i)=>{const b=it.s==='now'?K.lab.now:it.s==='done'?'✓':k==='books'?'#'+(++nq):'';return`<button class="tile" data-i="${i}" data-s="${it.s}" aria-pressed="false"><span class="cvr"><span class="ci"></span>${b?`<span class="bd">${b}</span>`:''}</span><span class="tt">${it.t}</span></button>`}).join('')}</div>`;
+const tiles=$$('.tile',el),F=$('.feat',el);
+function sel(i){si=i;const it=items[i],p=it.s==='done'?100:it.s==='now'?(it.p||0):0;
+$('.fl',F).innerHTML=it.s==='now'?`<i class="dot"></i>${K.now}`:K.lab[it.s];$('.ft',F).textContent=it.t;$('.fm',F).textContent=it.a||'';$('.pn span',F).textContent=it.n||(it.s==='done'?'Completed.':'');
+place($('.ci',F),it);cover($('.ci',F),it,k);const bar=$('.pb i',F);bar.style.transition='none';bar.style.transform='scaleX(0)';void bar.offsetWidth;bar.style.transition='';bar.style.transform=`scaleX(${p/100})`;countTo($('.pn b',F),p,it.s==='next');
+tiles.forEach((t,j)=>t.setAttribute('aria-pressed',j===i))}
+const apply=()=>tiles.forEach((t,i)=>{const it=items[i];t.hidden=!((f==='all'||it.s===f)&&(it.t+' '+(it.a||'')).toLowerCase().includes(q))});
+el.addEventListener('click',e=>{const c=e.target.closest('.chip'),t=e.target.closest('.tile');if(c){f=c.dataset.f;$$('.chip',el).forEach(x=>x.setAttribute('aria-pressed',x===c));apply()}else if(t){sel(+t.dataset.i);$('.sh-body').scrollTo({top:0,behavior:RM?'auto':'smooth'})}});
+$('.q',el).addEventListener('input',e=>{q=e.target.value.trim().toLowerCase();apply()});
+tiles.forEach((t,i)=>{const c=$('.ci',t);place(c,items[i]);c._d={it:items[i],k};lazy.observe(c)});el.redo=()=>sel(si);sel(0);return el}
+
+/* the sheet: opens from the bottom, drag the header down to dismiss */
+const sh=$('#sheet'),pan=$('.panel',sh),scr=$('.scrim',sh),sg=$('.seg',sh),views={};let sOpen=false,lastF=null,curK='games';
+function show(k){curK=k;if(!views[k]){views[k]=build(k);$('.sh-body').append(views[k])}for(const n in views)views[n].hidden=n!==k;sg.dataset.t=k==='books'?1:0;$$('.seg button',sh).forEach(b=>b.setAttribute('aria-selected',b.dataset.k===k));$('.sh-body').scrollTop=0;views[k].redo()}
+$$('.seg button',sh).forEach(b=>b.onclick=()=>show(b.dataset.k));
+const lock=v=>{$$('header.nav,main,footer').forEach(e=>e.inert=v);root.style.overflow=v?'hidden':''};
+function openSheet(){if(sOpen)return;sOpen=true;lastF=document.activeElement;sh.hidden=false;lock(true);show(curK);void pan.offsetHeight;sh.classList.add('open');$('.x',sh).focus({preventScroll:true})}
+function closeSheet(){if(!sOpen)return;sOpen=false;sh.classList.remove('open');pan.style.transition='';pan.style.transform='';scr.style.opacity='';lock(false);setTimeout(()=>{if(!sOpen)sh.hidden=true},560);if(lastF)lastF.focus({preventScroll:true})}
+$('#beyond').onclick=openSheet;$('.x',sh).onclick=closeSheet;scr.onclick=closeSheet;addEventListener('keydown',e=>{if(e.key==='Escape')closeSheet()});
+const hd=$('.sh-head',sh);let dg=null;
+hd.addEventListener('pointerdown',e=>{if(e.target.closest('button'))return;dg={y0:e.clientY,y:0,h:[[e.timeStamp,e.clientY]]};hd.setPointerCapture(e.pointerId);pan.style.transition='none'});
+hd.addEventListener('pointermove',e=>{if(!dg)return;const dy=e.clientY-dg.y0;dg.y=dy<0?-Math.sqrt(-dy)*2:dy;pan.style.transform=`translate3d(0,${dg.y}px,0)`;scr.style.opacity=1-cl(dg.y/pan.offsetHeight,0,1)*.9;dg.h.push([e.timeStamp,e.clientY]);if(dg.h.length>8)dg.h.shift()});
+const dEnd=e=>{if(!dg)return;const d=dg;dg=null;const h=d.h.filter(p=>e.timeStamp-p[0]<100),a=h[0],b=h[h.length-1],vel=h.length>1&&b[0]>a[0]?(b[1]-a[1])/(b[0]-a[0])*1000:0;pan.style.transition='';if(d.y+(vel/1000)*.99/.01>pan.offsetHeight*.3)closeSheet();else{pan.style.transform='';scr.style.opacity=''}};
+hd.addEventListener('pointerup',dEnd);hd.addEventListener('pointercancel',dEnd);
 
 /* reveals and count-up */
 const count=el=>{const N=+el.dataset.count;if(RM||!N){el.textContent=N;return}const t0=performance.now();(function f(t){const p=Math.min((t-t0)/1400,1);el.textContent=Math.round(N*(p===1?1:1-Math.pow(2,-10*p)));if(p<1)requestAnimationFrame(f)})(t0)};
