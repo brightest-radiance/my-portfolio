@@ -332,50 +332,239 @@ chips.forEach(c=>c.onclick=()=>go(S.findIndex(s=>s[0]===+c.dataset.p)));
 addEventListener('resize',measure);measure();
 
 /* ===== GAMES AND BOOKS: edit these two lists whenever you like =====
-   Games are ["Title","Studio"] pairs. Move a pair between done(...) and next(...) as you finish things.
-   An optional third item fixes a cover: the exact Wikipedia article name, e.g. ["Control","Remedy Entertainment","Control (video game)"], or a direct image link.
-   The item you are playing or reading is an object: t = title, a = studio or author, p = progress 0-100, n = short note.
-   Covers load automatically from public sources. If one is wrong or missing, add c:"https://...image.jpg" to an object,
-   or save your own image as covers/<title-in-lowercase-with-hyphens>.jpg (that file is checked first). */
+   Image-loading only: the page design, copy, roadmap, list contents and statuses remain unchanged.
+   Curated artwork is tried first; then Steam cover art / public catalogues are checked and verified
+   before display. Failed URLs are never saved as successful cache entries. */
 const COVER_EXT='jpg';
-const opt=x=>/^http/.test(x||'')?{c:x}:{w:x},done=(...a)=>a.map(([t,a,x])=>({t,a,...opt(x),s:'done'})),next=(...a)=>a.map(([t,a,x])=>({t,a,...opt(x),s:'next'}));
+const opt=x=>/^https?:\/\//i.test(x||'')?{c:x}:{w:x},done=(...a)=>a.map(([t,a,x])=>({t,a,...opt(x),s:'done'})),next=(...a)=>a.map(([t,a,x])=>({t,a,...opt(x),s:'next'}));
+const slug=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const hue=t=>[...t].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
+const place=(el,it)=>{if(el.dataset.t!==it.t){el.dataset.loaded='';el.dataset.loading='false'}el.className='ci mono';el.dataset.t=it.t;el.style.setProperty('--h',hue(it.t));el.innerHTML=`<span class="nm">${it.t}</span>`};
+
+/* Known Steam app IDs let most PC games use the proper vertical library artwork directly. */
+const GAME_IDS={
+ "Resident Evil 4 Remake":2050650,"Sifu":2138710,"Marvel's Spider-Man 2":2651280,"Marvel's Spider-Man Remastered":1817070,"Doom (2016)":379720,
+ "Kingdom Come: Deliverance":379430,"A Plague Tale: Innocence":752590,"Horizon Zero Dawn Remastered":2561580,
+ "The Last of Us Part I":1888930,"Tainted Grail: The Fall of Avalon":1466060,"God of War Ragnarök":2322010,
+ "God of War (2018)":1593500,"Elden Ring":1245620,"Black Myth: Wukong":2358720,"Kena: Bridge of Spirits":1954200,
+ "Grand Theft Auto V":271590,"Batman: Arkham Knight":208650,"Dark Souls":570940,"Dark Souls II":335300,
+ "Dark Souls III":374320,"Sekiro: Shadows Die Twice":814380,"The Witcher 3: Wild Hunt":292030,"Mad Max":234140,
+ "Dragon Ball: Sparking! Zero":1790600,"WWE 2K24":2315690,"Tekken 8":1778820,"Call of Duty: WWII":476600,
+ "Ghost of Tsushima":2215430,"Forza Horizon 5":1551360,
+ "Marvel's Guardians of the Galaxy":1088850,"Devil May Cry 5":601150,"Detroit: Become Human":1222140,
+ "Ratchet & Clank: Rift Apart":1895880,"Returnal":1649240,"Little Nightmares":424840,
+ "Control":870780,"Senua's Saga: Hellblade II":2461850,"Tomb Raider (2013)":203160,"Assassin's Creed Unity":289650,
+ "A Plague Tale: Requiem":1182900,"Little Nightmares II":860510,"Rise of the Tomb Raider":391220,
+ "Watch Dogs":243470,"Star Wars Jedi: Fallen Order":1172380,"Resident Evil Village":1196590,"Hitman (2016)":236870,
+ "Doom Eternal":782330,"Hogwarts Legacy":990080,"Quantum Break":474960,"Shadow of the Tomb Raider":750920,
+ "Watch Dogs 2":447040,"Star Wars Jedi: Survivor":1774580,"Silent Hill 2 Remake":2124490,"Assassin's Creed Odyssey":812140,
+ "Dragon's Dogma 2":2054970,"Monster Hunter Wilds":2246340,"Mafia: Definitive Edition":1030840,"Doom: The Dark Ages":3017860,
+ "Horizon Forbidden West":2420110,"Baldur's Gate 3":1086940,"Death Stranding":1850570,"The Last of Us Part II":2531310,
+ "Red Dead Redemption 2":1174180,"The Elder Scrolls IV: Oblivion Remastered":2623190,"Hollow Knight":367520,
+ "Final Fantasy XVI":2515020,"Metal Gear Solid Delta: Snake Eater":1933340,"Kingdom Come: Deliverance II":1771300,
+ "Hollow Knight: Silksong":1030300,"Final Fantasy VII Remake Intergrade":1462040,"Final Fantasy VII Rebirth":2909400,"Assassin's Creed Valhalla":2208920,
+ "Yakuza: Like a Dragon":1235140,"Like a Dragon: Infinite Wealth":2072450,"Clair Obscur: Expedition 33":1903340,
+ "Fallout 4":377160
+};
+const GAME_WIKI={
+ "007 First Light":["007 First Light (video game)","007 First Light"],
+ "Marvel's Spider-Man 2":["Marvel's Spider-Man 2"],
+ "The Amazing Spider-Man 2":["The Amazing Spider-Man 2 (2014 video game)"],
+ "Uncharted 4: A Thief's End":["Uncharted 4: A Thief's End"],
+ "Minecraft":["Minecraft"],
+ "The Legend of Zelda: Breath of the Wild":["The Legend of Zelda: Breath of the Wild"],
+ "Forza Horizon 6":["Forza Horizon 6 (video game)","Forza Horizon 6"],
+ "Avatar: Frontiers of Pandora":["Avatar: Frontiers of Pandora"],
+ "Stellar Blade":["Stellar Blade"],
+ "Alan Wake 2":["Alan Wake 2"],
+ "Ghost of Yōtei":["Ghost of Yōtei","Ghost of Yotei"],
+ "LEGO Batman: Legacy of the Dark Knight":["Lego Batman: Legacy of the Dark Knight","LEGO Batman: Legacy of the Dark Knight"],
+ "MOUSE: P.I. For Hire":["MOUSE: P.I. For Hire","Mouse: P.I. for Hire"],
+ "Pragmata":["Pragmata"],
+ "Assassin's Creed Black Flag Resynced":["Assassin's Creed Black Flag Resynced"],
+ "Grand Theft Auto VI":["Grand Theft Auto VI"],
+ "The Legend of Zelda: Ocarina of Time Remake":["The Legend of Zelda: Ocarina of Time (2026 video game)"]
+};
+/* Skip generic Steam title search for delisted games where it can return a similar but wrong game. */
+const SKIP_STEAM_SEARCH = new Set(["The Amazing Spider-Man 2", "Uncharted 4: A Thief's End", "The Legend of Zelda: Ocarina of Time Remake"]);
+/* The 2026 Ocarina of Time remake has its own official art; do not show the 1998 original as a fallback. */
+const CURATED_ONLY_GAMES = new Set(["The Legend of Zelda: Ocarina of Time Remake"]);
+/* Editions chosen by ISBN where available. Other book titles use verified Google Books/Open Library results. */
+const BOOK_ISBN={
+ "Man's Search for Meaning":"9780807014295","Babel":"9780063021426","The Alchemist":"9780061122415",
+ "The Fifth Mountain":"9780060929801","The Metamorphosis":"9780553213690","The Art of War":"9781590302255",
+ "The Compound Effect":"9781593157241",
+ "The Brothers Karamazov":"9780374528379"
+};
+
 const G=[
-{t:"Resident Evil 4 Remake",a:"Capcom",w:"Resident Evil 4 (2023 video game)",s:"now",p:10,n:"Playing it now."},
+{t:"Resident Evil 4 Remake",a:"Capcom",w:"Resident Evil 4 (2023 video game)",c:"https://cdn.cloudflare.steamstatic.com/steam/apps/2050650/library_600x900.jpg",s:"now",p:10,n:"Playing it now."},
 ...done(
-["Sifu","Sloclap"],["Marvel's Spider-Man 2","Insomniac Games"],["Doom (2016)","id Software","Doom (2016 video game)"],["Kingdom Come: Deliverance","Warhorse Studios"],["A Plague Tale: Innocence","Asobo Studio"],["Horizon Zero Dawn Remastered","Guerrilla Games and Nixxes Software","https://cdn.cloudflare.steamstatic.com/steam/apps/2561580/library_600x900.jpg"],["The Last of Us Part I","Naughty Dog"],["007 First Light","IO Interactive"],["Tainted Grail: The Fall of Avalon","Questline"],
+["Sifu","Sloclap"],["Marvel's Spider-Man 2","Insomniac Games"],["Marvel's Spider-Man Remastered","Insomniac Games","https://cdn.cloudflare.steamstatic.com/steam/apps/1817070/library_600x900.jpg"],["Doom (2016)","id Software","Doom (2016 video game)"],["Kingdom Come: Deliverance","Warhorse Studios"],["A Plague Tale: Innocence","Asobo Studio"],["Horizon Zero Dawn Remastered","Guerrilla Games and Nixxes Software","https://cdn.cloudflare.steamstatic.com/steam/apps/2561580/library_600x900.jpg"],["The Last of Us Part I","Naughty Dog"],["007 First Light","IO Interactive"],["Tainted Grail: The Fall of Avalon","Questline"],
 ["God of War Ragnarök","Santa Monica Studio"],["God of War (2018)","Santa Monica Studio","God of War (2018 video game)"],["Elden Ring","FromSoftware"],["Black Myth: Wukong","Game Science"],["Kena: Bridge of Spirits","Ember Lab"],["Grand Theft Auto V","Rockstar North"],["Batman: Arkham Knight","Rocksteady Studios"],
-["Dark Souls","FromSoftware"],["Dark Souls II","FromSoftware"],["Dark Souls III","FromSoftware"],["Sekiro: Shadows Die Twice","FromSoftware"],["The Witcher 3: Wild Hunt","CD Projekt Red"],["Minecraft","Mojang Studios"],["The Legend of Zelda: Breath of the Wild","Nintendo EPD"],["Mad Max","Avalanche Studios","Mad Max (video game)"],["Dragon Ball: Sparking! Zero","Spike Chunsoft"],
-["WWE 2K19","Visual Concepts"],["WWE 2K24","Visual Concepts"],["WWE 2K25","Visual Concepts"],["WWE 2K26","Visual Concepts"],["Tekken 8","Bandai Namco Studios"],["Call of Duty: WWII","Sledgehammer Games"],["The Amazing Spider-Man 2","Beenox","The Amazing Spider-Man 2 (video game)"],["Ghost of Tsushima","Sucker Punch Productions"],["Forza Horizon 5","Playground Games"],["Forza Horizon 6","Playground Games"]),
+["Dark Souls","FromSoftware"],["Dark Souls II","FromSoftware"],["Dark Souls III","FromSoftware"],["Sekiro: Shadows Die Twice","FromSoftware"],["The Witcher 3: Wild Hunt","CD Projekt Red"],["Minecraft","Mojang Studios","https://cdn2.steamgriddb.com/grid/726c858fb9844f1d203177e1bebdff2d.png"],["The Legend of Zelda: Breath of the Wild","Nintendo EPD"],["Mad Max","Avalanche Studios","Mad Max (video game)"],["Dragon Ball: Sparking! Zero","Spike Chunsoft"],
+["WWE 2K19","Visual Concepts"],["WWE 2K24","Visual Concepts"],["WWE 2K25","Visual Concepts"],["WWE 2K26","Visual Concepts"],["Tekken 8","Bandai Namco Studios"],["Call of Duty: WWII","Sledgehammer Games"],["The Amazing Spider-Man 2","Beenox","https://i.jeuxactus.com/datas/jeux/t/h/the-amazing-spider-man-2/xl/the-amazing-spider-man-2-532e7bdacb95b.jpg"],["Ghost of Tsushima","Sucker Punch Productions"],["Forza Horizon 5","Playground Games"],["Forza Horizon 6","Playground Games"]),
 ...next(
-["Avatar: Frontiers of Pandora","Massive Entertainment"],["Marvel's Guardians of the Galaxy","Eidos-Montréal"],["Devil May Cry 5","Capcom"],["Detroit: Become Human","Quantic Dream"],["Stellar Blade","Shift Up"],["Uncharted 4: A Thief's End","Naughty Dog"],["Ratchet & Clank: Rift Apart","Insomniac Games"],["Returnal","Housemarque"],["Little Nightmares","Tarsier Studios","Little Nightmares (video game)"],
+["Avatar: Frontiers of Pandora","Massive Entertainment"],["Marvel's Guardians of the Galaxy","Eidos-Montréal"],["Devil May Cry 5","Capcom"],["Detroit: Become Human","Quantic Dream"],["Stellar Blade","Shift Up"],["Uncharted 4: A Thief's End","Naughty Dog","https://4.bp.blogspot.com/-NfhazjqS2SU/VzLnYboL4LI/AAAAAAABNkE/BFlqvCXFhboVBdFOvfZoeb1tT4CzYqGVQCLcB/s1600/uncharted-4-a-thiefs-end-game-cover.jpg"],["Ratchet & Clank: Rift Apart","Insomniac Games"],["Returnal","Housemarque"],["Little Nightmares","Tarsier Studios","Little Nightmares (video game)"],
 ["Control","Remedy Entertainment","Control (video game)"],["Senua's Saga: Hellblade II","Ninja Theory"],["Tomb Raider (2013)","Crystal Dynamics","Tomb Raider (2013 video game)"],["Alan Wake 2","Remedy Entertainment"],["Assassin's Creed Unity","Ubisoft Montreal"],["A Plague Tale: Requiem","Asobo Studio"],["Little Nightmares II","Tarsier Studios"],["Rise of the Tomb Raider","Crystal Dynamics"],
 ["Watch Dogs","Ubisoft Montreal","Watch Dogs (video game)"],["Star Wars Jedi: Fallen Order","Respawn Entertainment"],["Resident Evil Village","Capcom"],["Hitman (2016)","IO Interactive","Hitman (2016 video game)"],["Doom Eternal","id Software"],["Hogwarts Legacy","Avalanche Software"],["Quantum Break","Remedy Entertainment"],["Shadow of the Tomb Raider","Eidos-Montréal"],["Watch Dogs 2","Ubisoft Montreal"],
 ["Star Wars Jedi: Survivor","Respawn Entertainment"],["Silent Hill 2 Remake","Bloober Team","Silent Hill 2 (2024 video game)"],["Assassin's Creed Odyssey","Ubisoft Quebec"],["Dragon's Dogma 2","Capcom"],["Monster Hunter Wilds","Capcom"],["Mafia: Definitive Edition","Hangar 13"],["Doom: The Dark Ages","id Software"],["Horizon Forbidden West","Guerrilla Games"],
 ["Baldur's Gate 3","Larian Studios"],["Death Stranding","Kojima Productions"],["The Last of Us Part II","Naughty Dog"],["Red Dead Redemption 2","Rockstar Games"],["The Elder Scrolls IV: Oblivion Remastered","Virtuos and Bethesda Game Studios"],["Hollow Knight","Team Cherry","Hollow Knight (video game)"],["Final Fantasy XVI","Square Enix"],["Metal Gear Solid Delta: Snake Eater","Konami"],
-["Kingdom Come: Deliverance II","Warhorse Studios"],["Hollow Knight: Silksong","Team Cherry"],["Final Fantasy VII Rebirth","Square Enix"],["Death Stranding 2: On the Beach","Kojima Productions"],["Assassin's Creed Valhalla","Ubisoft Montreal"],
+["Kingdom Come: Deliverance II","Warhorse Studios"],["Hollow Knight: Silksong","Team Cherry"],["Final Fantasy VII Remake Intergrade","Square Enix","https://cdn.cloudflare.steamstatic.com/steam/apps/1462040/library_600x900.jpg"],["Final Fantasy VII Rebirth","Square Enix"],["Death Stranding 2: On the Beach","Kojima Productions"],["Assassin's Creed Valhalla","Ubisoft Montreal"],
 ["Yakuza: Like a Dragon","Ryu Ga Gotoku Studio"],["Like a Dragon: Infinite Wealth","Ryu Ga Gotoku Studio"],["Clair Obscur: Expedition 33","Sandfall Interactive"],["Until Then","Polychroma Games","Until Then (video game)"],["Dispatch","AdHoc Studio","Dispatch (video game)"],["Fallout 4","Bethesda Game Studios"],["Ghost of Yōtei","Sucker Punch Productions"],
-["LEGO Batman: Legacy of the Dark Knight","TT Games"],["MOUSE: P.I. For Hire","Fumi Games"],["Pragmata","Capcom"],["Assassin's Creed Black Flag Resynced","Ubisoft Singapore"],["Grand Theft Auto VI","Rockstar Games"],["The Legend of Zelda: Ocarina of Time Remake","Nintendo"])];
+["LEGO Batman: Legacy of the Dark Knight","TT Games"],["MOUSE: P.I. For Hire","Fumi Games"],["Pragmata","Capcom"],["Assassin's Creed Black Flag Resynced","Ubisoft Singapore"],["Grand Theft Auto VI","Rockstar Games"],["The Legend of Zelda: Ocarina of Time Remake","Nintendo","https://assets.nintendo.com/image/upload/f_auto/q_auto/dpr_1.5/store/software/switch2/70010000130792/2e76ea7cb3eb833a0cbe8c9b016b28b3a7ef95838b66c1eaced1c0db7747dd37"])];
 const B=[
 {t:"Man's Search for Meaning",a:"Viktor E. Frankl",s:"now",p:30,n:"Reading it now."},
-...[["Babel","R. F. Kuang"],["The Alchemist","Paulo Coelho"],["The Fifth Mountain","Paulo Coelho"],["The Metamorphosis","Franz Kafka"],["The Art of War","Sun Tzu"],["Awa Maru - Titanic of Japan","Rei Kimura","https://covers.openlibrary.org/b/isbn/9788184981377-L.jpg?default=false"],["Bhagavad Gita","Attributed to Vyasa"],["The Compound Effect","Darren Hardy"]].map(([t,a,c])=>({t,a,c,s:'done'})),
+...[["Babel","R. F. Kuang","https://images.squarespace-cdn.com/content/v1/64d65d2bd8feb358d1e08f2e/f004df83-3258-4b88-b81b-3bc1e5263c4f/57945316.jpg"],["The Alchemist","Paulo Coelho"],["The Fifth Mountain","Paulo Coelho"],["The Metamorphosis","Franz Kafka"],["The Art of War","Sun Tzu"],["Awa Maru - Titanic of Japan","Rei Kimura","https://is1-ssl.mzstatic.com/image/thumb/Publication/96/dd/a0/mzi.udxfzrtm.jpg/600x900wz.jpg"],["Bhagavad Gita","Attributed to Vyasa"],["The Compound Effect","Darren Hardy"]].map(([t,a,c])=>({t,a,c,s:'done'})),
 {t:"The Brothers Karamazov",a:"Fyodor Dostoevsky",s:"next"}];
 
 const KIND={games:{list:G,now:'Playing now',lab:{done:'Finished',now:'Playing',next:'Backlog'},fin:'finished',ph:'Search games'},books:{list:B,now:'Reading now',lab:{done:'Read',now:'Reading',next:'Up next'},fin:'read',ph:'Search books'}};
 const RK={now:0,done:1,next:2};
-const slug=t=>t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-const hue=t=>[...t].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
-const place=(el,it)=>{el.className='ci mono';el.dataset.t=it.t;el.style.setProperty('--h',hue(it.t));el.innerHTML=`<span class="nm">${it.t}</span>`};
-const loadImg=u=>new Promise(r=>{if(!u)return r(null);const im=new Image();im.onload=()=>r(im);im.onerror=()=>r(null);im.src=u});
-let cache={};try{cache=JSON.parse(localStorage.getItem('kn-cov2')||'{}')}catch(e){}
-const J=u=>fetch(u).then(r=>r.json());
-const wp=async t=>{const d=await J(`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(t)}&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=500&pilicense=any&format=json&origin=*`);const p=Object.values((d.query||{}).pages||{})[0];return p&&p.thumbnail?p.thumbnail.source:''};
-async function lookup(it,k){if(cache[it.t])return cache[it.t];let u='';
-try{if(k==='books'){const au=it.a?'&author='+encodeURIComponent(it.a.split(' ').pop()):'';const d=await J(`https://openlibrary.org/search.json?title=${encodeURIComponent(it.t)}${au}&limit=5&fields=cover_i`);const h=(d.docs||[]).find(x=>x.cover_i);if(h)u=`https://covers.openlibrary.org/b/id/${h.cover_i}-L.jpg`}
-for(const c of [it.w,it.t+(k==='games'?' (video game)':' (novel)'),it.t]){if(u)break;if(c)u=await wp(c).catch(()=>'')}
-if(!u&&k==='games'){const d=await J(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(it.t+' video game')}&gsrlimit=1&prop=pageimages&piprop=thumbnail&pithumbsize=500&pilicense=any&format=json&origin=*`),p=Object.values((d.query||{}).pages||{})[0],nm=x=>x.toLowerCase().replace(/[^a-z0-9]+/g,'');if(p&&p.thumbnail&&nm(p.title).includes(nm(it.t.replace(/\s*\(.*?\)\s*/g,''))))u=p.thumbnail.source}}catch(e){}
-if(u){cache[it.t]=u;try{localStorage.setItem('kn-cov2',JSON.stringify(cache))}catch(e){}}return u}
-async function cover(el,it,k){let im=await loadImg(it.c)||await loadImg(`covers/${slug(it.t)}.${COVER_EXT}`);if(!im)im=await loadImg(await lookup(it,k));if(im&&el.dataset.t===it.t){im.alt=it.t;el.className='ci';el.replaceChildren(im)}}
-const lazy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){lazy.unobserve(e.target);const d=e.target._d;cover(e.target,d.it,d.k)}}),{root:$('.sh-body'),rootMargin:'400px'});
+
+/* A timeout prevents one stalled image request from blocking a tile forever. */
+const loadImg=(url,timeout=4200)=>new Promise(resolve=>{
+ if(!url||typeof url!=='string')return resolve(null);
+ let finished=false,timer;
+ const img=new Image();img.decoding='async';
+ const finish=result=>{if(finished)return;finished=true;clearTimeout(timer);img.onload=null;img.onerror=null;resolve(result)};
+ img.onload=()=>finish(img);img.onerror=()=>finish(null);
+ timer=setTimeout(()=>finish(null),timeout);
+ img.src=url;
+});
+const normalise=s=>(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const wordScore=(candidate,target)=>{
+ const a=normalise(candidate),b=normalise(target);if(!a||!b)return 0;
+ const roman=['i','ii','iii','iv','v','vi','vii','viii','ix','x'];
+ const av=a.split(' ').at(-1),bv=b.split(' ').at(-1);if(roman.includes(av)&&roman.includes(bv)&&av!==bv)return 0;
+ if(a===b)return 1;if(a.includes(b)||b.includes(a)){const shorter=a.length<=b.length?a:b,longer=a.length<=b.length?b:a;if(shorter!==longer&&shorter.split(' ').length===1)return 0;return .88;}
+ const stop=new Set(['the','a','an','of','for','and','edition','game','video','remake','remastered']);
+ const aa=[...new Set(a.split(' ').filter(x=>x&&!stop.has(x)))],bb=[...new Set(b.split(' ').filter(x=>x&&!stop.has(x)))];
+ if(!aa.length||!bb.length)return 0;const hit=aa.filter(x=>bb.includes(x)).length;
+ return (2*hit)/(aa.length+bb.length);
+};
+let coverCache={};try{coverCache=JSON.parse(localStorage.getItem('kn-cover-v5')||'{}')}catch(e){}
+const lookupInFlight=new Map();
+const rememberCover=(title,url)=>{if(!url)return;coverCache[title]=url;try{localStorage.setItem('kn-cover-v5',JSON.stringify(coverCache))}catch(e){}};
+const forgetCover=title=>{delete coverCache[title];try{localStorage.setItem('kn-cover-v5',JSON.stringify(coverCache))}catch(e){}};
+const J=async(url,timeout=6500)=>{
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),timeout);
+ try{const response=await fetch(url,{mode:'cors',credentials:'omit',signal:controller.signal});if(!response.ok)throw new Error('Image lookup unavailable');return await response.json()}
+ finally{clearTimeout(timer)}
+};
+const wikiImage=async title=>{
+ const url=`https://en.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&redirects=1&prop=pageimages&piprop=thumbnail&pithumbsize=720&pilicense=any&format=json&origin=*`;
+ const data=await J(url);const page=Object.values((data.query||{}).pages||{})[0];return page&&page.thumbnail&&page.thumbnail.source?page.thumbnail.source:'';
+};
+const steamArt=async id=>{
+ const bases=[
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${id}/library_600x900.jpg`,
+  `https://cdn.akamai.steamstatic.com/steam/apps/${id}/library_600x900.jpg`,
+  `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${id}/library_600x900.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${id}/library_600x900_2x.jpg`,
+  `https://cdn.akamai.steamstatic.com/steam/apps/${id}/library_600x900_2x.jpg`,
+  `https://cdn.cloudflare.steamstatic.com/steam/apps/${id}/header.jpg`
+ ];
+ for(const url of bases){const image=await loadImg(url);if(image)return url}return '';
+};
+const steamSearchArt=async title=>{
+ const data=await J(`https://store.steampowered.com/api/storesearch/?term=${encodeURIComponent(title)}&l=english&cc=us`);
+ const entries=data.items||[];
+ const best=entries.map(item=>({item,score:wordScore(item.name,title)})).sort((a,b)=>b.score-a.score)[0];
+ if(!best||best.score<.84||!best.item.id)return '';
+ return await steamArt(best.item.id);
+};
+const bookCatalogArt=async item=>{
+ const author=(item.a||'').split(' ').filter(Boolean).slice(-1)[0]||'';
+ /* Google Books search: rank results by title first and author second; test every returned image. */
+ try{
+  const query=`intitle:${item.t}${author?`+inauthor:${author}`:''}`;
+  const data=await J(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=10&printType=books`);
+  const candidates=(data.items||[]).map(x=>({x,score:wordScore(x.volumeInfo&&x.volumeInfo.title,item.t)}))
+   .filter(x=>x.score>=.68).sort((a,b)=>b.score-a.score);
+  for(const result of candidates){
+   const info=result.x.volumeInfo||{},authorLine=(info.authors||[]).join(' ');
+   if(author&&item.a&&normalise(authorLine)&&!normalise(authorLine).includes(normalise(author))&&result.score<.95)continue;
+   const links=info.imageLinks||{};
+   const candidates=[links.extraLarge,links.large,links.medium,links.thumbnail,links.smallThumbnail].filter(Boolean)
+    .map(u=>u.replace(/^http:/i,'https:').replace(/&zoom=\d+/,'&zoom=1'));
+   for(const imageUrl of candidates)if(await loadImg(imageUrl)){return imageUrl}
+  }
+ }catch(e){}
+ /* Open Library: validate both title match and the actual returned cover before accepting it. */
+ try{
+  const url=`https://openlibrary.org/search.json?title=${encodeURIComponent(item.t)}${author?`&author=${encodeURIComponent(author)}`:''}&limit=10&fields=cover_i,title,author_name`;
+  const data=await J(url);const candidates=(data.docs||[]).map(doc=>({doc,score:wordScore(doc.title,item.t)}))
+   .filter(x=>x.doc.cover_i&&x.score>=.68).sort((a,b)=>b.score-a.score);
+  for(const result of candidates){
+   const candidate=`https://covers.openlibrary.org/b/id/${result.doc.cover_i}-L.jpg?default=false`;
+   if(await loadImg(candidate))return candidate;
+  }
+ }catch(e){}
+ return '';
+};
+async function lookup(item,kind){
+ const cached=coverCache[item.t];
+ if(cached){if(await loadImg(cached))return cached;forgetCover(item.t)}
+ if(lookupInFlight.has(item.t))return lookupInFlight.get(item.t);
+ const pending=(async()=>{
+  let found='';
+  if(kind==='games'){
+   /* Never use a cached/generated cover from the 1998 Zelda game for the 2026 remake entry. */
+   if(CURATED_ONLY_GAMES.has(item.t))return '';
+   const id=GAME_IDS[item.t];
+   if(id)found=await steamArt(id);
+   if(!found&&!SKIP_STEAM_SEARCH.has(item.t)){try{found=await steamSearchArt(item.t)}catch(e){}}
+   if(found){rememberCover(item.t,found);return found}
+   const titles=[...(GAME_WIKI[item.t]||[]),item.w,`${item.t} (video game)`,item.t].filter(Boolean);
+   for(const title of [...new Set(titles)]){try{const url=await wikiImage(title);if(url&&await loadImg(url)){rememberCover(item.t,url);return url}}catch(e){}}
+   /* Search Wikipedia's best-matching result for titles whose article name differs from the display title. */
+   try{
+    const query=(GAME_WIKI[item.t]&&GAME_WIKI[item.t][0])||item.t;
+    const data=await J(`https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrnamespace=0&gsrlimit=6&prop=pageimages&piprop=thumbnail&pithumbsize=720&format=json&origin=*`);
+    const pages=Object.values((data.query||{}).pages||{}).sort((a,b)=>(a.index||99)-(b.index||99));
+    const ranked=pages.map(page=>({page,score:Math.max(wordScore(page.title,query),wordScore(page.title,item.t))}))
+     .filter(x=>x.page.thumbnail&&x.score>=.55).sort((a,b)=>b.score-a.score);
+    for(const result of ranked){const url=result.page.thumbnail.source;if(await loadImg(url)){rememberCover(item.t,url);return url}}
+   }catch(e){}
+  }else{
+   const isbn=BOOK_ISBN[item.t];
+   if(isbn){const url=`https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg?default=false`;if(await loadImg(url)){rememberCover(item.t,url);return url}}
+   found=await bookCatalogArt(item);
+   if(found){rememberCover(item.t,found);return found}
+   for(const title of [`${item.t} (book)`,`${item.t} (novel)`,item.t]){
+    try{const url=await wikiImage(title);if(url&&await loadImg(url)){rememberCover(item.t,url);return url}}catch(e){}
+   }
+  }
+  return '';
+ })();
+ lookupInFlight.set(item.t,pending);
+ try{return await pending}finally{lookupInFlight.delete(item.t)}
+}
+async function cover(el,item,kind){
+ if(!el||!item||el.dataset.loaded==='true')return;
+ const request=(el._coverRequest||0)+1;el._coverRequest=request;
+ el.dataset.loading='true';const marker=item.t;const candidates=[];
+ if(item.c)candidates.push(item.c);
+ candidates.push(`covers/${slug(item.t)}.${COVER_EXT}`);
+ if(kind==='games'&&GAME_IDS[item.t]){
+  const id=GAME_IDS[item.t];candidates.push(
+   `https://cdn.cloudflare.steamstatic.com/steam/apps/${id}/library_600x900.jpg`,
+   `https://cdn.akamai.steamstatic.com/steam/apps/${id}/library_600x900.jpg`,
+   `https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/${id}/library_600x900.jpg`,
+   `https://cdn.cloudflare.steamstatic.com/steam/apps/${id}/library_600x900_2x.jpg`
+  );
+ }
+ if(kind==='books'&&BOOK_ISBN[item.t])candidates.push(`https://covers.openlibrary.org/b/isbn/${BOOK_ISBN[item.t]}-L.jpg?default=false`);
+ for(const url of [...new Set(candidates)]){
+  const image=await loadImg(url);
+  if(image&&el.dataset.t===marker&&el._coverRequest===request){image.alt=item.t;image.loading='lazy';el.className='ci';el.replaceChildren(image);el.dataset.loaded='true';el.dataset.loading='false';rememberCover(item.t,url);return}
+ }
+ const url=await lookup(item,kind);
+ if(url&&el.dataset.t===marker&&el._coverRequest===request){const image=await loadImg(url);if(image&&el._coverRequest===request){image.alt=item.t;image.loading='lazy';el.className='ci';el.replaceChildren(image);el.dataset.loaded='true';el.dataset.loading='false';return}}
+ /* Keep the existing designed fallback for rare items with no accessible cover source. */
+ if(el.dataset.t===marker&&el._coverRequest===request){place(el,item);el.dataset.loaded='fallback';el.dataset.loading='false'}
+}
+const lazy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){lazy.unobserve(e.target);const d=e.target._d;cover(e.target,d.it,d.k)}}),{root:$('.sh-body'),rootMargin:'600px'});
 function countTo(el,p,off){if(off||RM||!p){el.textContent=off?'Not started':p+'%';return}const t0=performance.now();(function f(t){const k=Math.min((t-t0)/1000,1);el.textContent=(k<1?Math.round(p*(1-Math.pow(2,-10*k))):p)+'%';if(k<1)requestAnimationFrame(f)})(t0)}
 function build(k){const K=KIND[k],items=[...K.list].sort((a,b)=>RK[a.s]-RK[b.s]),el=document.createElement('section');el.className='view';el.hidden=true;
 const cnt=s=>items.filter(i=>s==='all'||i.s===s).length,dn=cnt('done');let nq=0,si=0,f='all',q='';
@@ -383,7 +572,7 @@ el.innerHTML=`<div class="feat"><div class="cvr"><span class="ci"></span></div><
 const tiles=$$('.tile',el),F=$('.feat',el);
 function sel(i){si=i;const it=items[i],p=it.s==='done'?100:it.s==='now'?(it.p||0):0;
 $('.fl',F).innerHTML=it.s==='now'?`<i class="dot"></i>${K.now}`:K.lab[it.s];$('.ft',F).textContent=it.t;$('.fm',F).textContent=it.a||'';$('.pn span',F).textContent=it.n||(it.s==='done'?'Completed.':'');
-place($('.ci',F),it);cover($('.ci',F),it,k);const bar=$('.pb i',F);bar.style.transition='none';bar.style.transform='scaleX(0)';void bar.offsetWidth;bar.style.transition='';bar.style.transform=`scaleX(${p/100})`;countTo($('.pn b',F),p,it.s==='next');
+const featureCover=$('.ci',F);if(featureCover.dataset.t!==it.t||featureCover.dataset.loaded!=='true')place(featureCover,it);cover(featureCover,it,k);const bar=$('.pb i',F);bar.style.transition='none';bar.style.transform='scaleX(0)';void bar.offsetWidth;bar.style.transition='';bar.style.transform=`scaleX(${p/100})`;countTo($('.pn b',F),p,it.s==='next');
 tiles.forEach((t,j)=>t.setAttribute('aria-pressed',j===i))}
 const apply=()=>tiles.forEach((t,i)=>{const it=items[i];t.hidden=!((f==='all'||it.s===f)&&(it.t+' '+(it.a||'')).toLowerCase().includes(q))});
 el.addEventListener('click',e=>{const c=e.target.closest('.chip'),t=e.target.closest('.tile');if(c){f=c.dataset.f;$$('.chip',el).forEach(x=>x.setAttribute('aria-pressed',x===c));apply()}else if(t){sel(+t.dataset.i);$('.sh-body').scrollTo({top:0,behavior:RM?'auto':'smooth'})}});
