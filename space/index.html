@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Stellar’s Space | Kaustubh Niroula</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{--bg:#08090A;--bg2:#111214;--ink:#F4F4F2;--mut:#8D9198;--line:rgba(255,255,255,.12);--acc:#FF3B3B;--d:"Barlow Condensed","Arial Narrow",sans-serif;--tb:#c98450;--ts:#c3c8d0;--tg:#ffc83d;color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+.w{width:min(980px,100% - 2.5rem);margin:0 auto;padding-bottom:5rem}
+.top{display:flex;justify-content:space-between;align-items:center;padding:1.1rem 0}
+.top a,.pill{color:var(--ink);text-decoration:none;font:600 .9rem system-ui;padding:.55rem 1rem;border-radius:99px;border:1px solid var(--line);background:none;cursor:pointer}
+.top a:hover,.pill:hover{border-color:var(--acc)}
+h1{font:800 clamp(3.8rem,16vw,10.5rem)/.84 var(--d);text-transform:uppercase;letter-spacing:-.015em;margin:3rem 0 1rem}
+h1::after{content:"";display:inline-block;width:.15em;height:.15em;background:var(--acc);margin-left:.06em}
+.lead{color:var(--mut);max-width:30rem;margin:0 0 2.5rem}
+.gm{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:700px){.gm{grid-template-columns:1fr}}
+.gc{display:grid;gap:.4rem;text-align:left;padding:0 0 1.2rem;border-radius:20px;border:1px solid var(--line);background:var(--bg2);color:inherit;font:inherit;cursor:pointer;overflow:hidden;transition:transform .4s cubic-bezier(.16,1,.3,1),border-color .2s}
+.gc:hover{transform:translateY(-4px);border-color:var(--acc)}.gc:active{transform:scale(.985)}
+.gc>:not(.art){margin:0 1.3rem}
+.gc b{font:800 2.6rem/.95 var(--d);text-transform:uppercase;margin-top:.6rem}.gc span{color:var(--mut)}.gc em{font-style:normal;color:var(--acc);font-weight:600;font-size:.9rem;margin-top:.4rem}
+.art{display:block;height:9rem;position:relative}
+.a2{background:linear-gradient(#5aa8ff 0 58%,#3f9e3e 58% 66%,#b5702f 66%)}
+.a2::before{content:"";position:absolute;left:26%;top:22%;width:2.4rem;height:2.4rem;background:#f2b72b;box-shadow:2.4rem 0 #c86a2a,4.8rem 0 #f2b72b}
+.a3{background:linear-gradient(#e0833c,#23394d 56%,#07090d 56%)}
+.a3::before{content:"";position:absolute;left:50%;bottom:0;width:120%;height:44%;translate:-50% 0;background:linear-gradient(#34373d,#1f2124);clip-path:polygon(45% 0,55% 0,100% 100%,0 100%)}
+.a3::after{content:"";position:absolute;left:calc(50% - 2px);bottom:0;width:4px;height:44%;background:repeating-linear-gradient(#e8e6df 0 .6rem,transparent .6rem 1.2rem)}
+.ah{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin:4.5rem 0 .8rem}
+h2{font:800 clamp(2.6rem,8vw,4.5rem)/.9 var(--d);text-transform:uppercase;margin:0}#cnt{color:var(--mut)}
+.pg{height:6px;border-radius:9px;background:var(--line);overflow:hidden;margin-bottom:1.2rem}.pg i{display:block;height:100%;width:0;background:var(--acc);transition:width .7s cubic-bezier(.16,1,.3,1)}
+.al{list-style:none;margin:0;padding:0;display:grid;gap:.55rem}
+.al li{display:grid;grid-template-columns:3rem 1fr auto;gap:1rem;align-items:center;padding:.75rem 1rem;border:1px solid var(--line);border-radius:14px;background:var(--bg2)}
+.al li:not(.on){opacity:.55}.al li:not(.on) .ic{border-color:var(--line);color:var(--mut)}
+.al small,.tst small,.tst em{display:block;color:var(--mut);font-style:normal;line-height:1.3}.al .mt{color:var(--mut);font-size:.85rem;text-align:right}
+.ic{width:3rem;height:3rem;display:grid;place-items:center;border:2px solid var(--c);color:var(--c);border-radius:10px;font:800 1.5rem/1 var(--d)}
+.t-b{--c:var(--tb)}.t-s{--c:var(--ts)}.t-g{--c:var(--tg)}
+.tst{position:fixed;z-index:300;right:16px;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);display:flex;gap:.9rem;align-items:center;max-width:min(24rem,100% - 32px);padding:.8rem 1.1rem;border-radius:14px;background:#17181b;border:1px solid rgba(255,255,255,.18);box-shadow:0 12px 40px rgba(0,0,0,.55);transform:translateY(170%);visibility:hidden;transition:transform .55s cubic-bezier(.16,1,.3,1),visibility 0s .55s}
+.tst.on{transform:none;visibility:visible;transition-delay:0s}
+dialog{background:var(--bg2);color:var(--ink);border:1px solid var(--line);border-radius:18px;padding:1.4rem;width:min(26rem,100% - 2rem)}dialog::backdrop{background:rgba(0,0,0,.65)}
+dialog h3{font:800 2.2rem/1 var(--d);text-transform:uppercase;margin:0 0 .4rem}.dm{color:var(--mut);margin:0 0 .8rem}
+#stage{position:fixed;inset:0;z-index:100;background:#07080a;overflow:hidden}#stage[hidden]{display:none}#host{position:absolute;inset:0}
+.ld{position:absolute;inset:0;display:grid;place-content:center;margin:0;color:var(--mut);text-align:center}
+/* shared by both games */
+.ov{position:absolute;inset:0;display:grid;place-items:center;padding:1rem;text-align:center;background:rgba(5,6,8,.5);z-index:5;overflow:auto}
+.ov>div{width:min(30rem,100%);background:rgba(14,15,17,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:1.3rem 1.4rem}
+.ov h3{font:800 clamp(2.4rem,8vw,3.2rem)/.9 var(--d);text-transform:uppercase;margin:0 0 .5rem}.ov p{margin:.35rem 0;color:#b9bcc2;font-size:.95rem}.ov b{color:var(--ink)}
+.bt{font:600 .92rem system-ui;color:var(--ink);padding:.6rem 1.1rem;border-radius:99px;border:1px solid rgba(255,255,255,.28);background:rgba(20,21,23,.7);cursor:pointer;margin:.25rem}.bt:hover{border-color:var(--acc)}.bt.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.row{display:flex;gap:.5rem;justify-content:center;align-items:center;flex-wrap:wrap;margin:.5rem 0}
+.strip{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:.8rem}.strip button{font:500 .8rem system-ui;color:#b9bcc2;padding:.4rem .8rem;border-radius:99px;border:1px solid var(--line);background:none;cursor:pointer}.strip button:hover{color:var(--ink);border-color:var(--acc)}
+</style>
+</head>
+<body>
+<div class="w">
+<nav class="top"><a href="../">Back to the site</a><button class="pill" id="cfg" type="button">Settings</button></nav>
+<h1>Stellar’s Space</h1>
+<p class="lead">Two games and a trophy case. Scores, settings and achievements save in this browser.</p>
+<div class="gm">
+<button class="gc" data-g="platformer" type="button"><i class="art a2"></i><b>Star Run</b><span>Side-scrolling platformer. Curated worlds up to level 19, then a level generator that never runs out and never builds an impossible jump.</span><em data-b="platformer"></em></button>
+<button class="gc" data-g="racer" type="button"><i class="art a3"></i><b>Stellar Drive</b><span>3D highway racing. Four cameras, nitro, one-way or two-way traffic, and drivers that brake, signal and change lanes.</span><em data-b="racer"></em></button>
+</div>
+<div class="ah"><h2>Achievements</h2><span id="cnt"></span></div>
+<div class="pg"><i id="bar"></i></div>
+<ul class="al" id="al"></ul>
+</div>
+<div id="stage" hidden><div id="host"></div></div>
+<div class="tst" id="tst" aria-live="polite"></div>
+<dialog id="dlg"><h3>Settings</h3><p class="dm">Graphics and resolution apply to Stellar Drive. Music and sound apply to both games.</p><div id="sp"></div><div class="row"><button class="pill" id="rs" type="button">Reset progress</button><button class="pill" id="cl" type="button">Close</button></div></dialog>
+<script type="module">
+const $=s=>document.querySelector(s),K='stellar-space-v2';
+let D={};try{D=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
+D.a||={};D.s||={};D.b||={};D.c={music:true,sfx:true,q:matchMedia('(pointer:coarse)').matches?'med':'high',scale:1,...D.c};
+const save=()=>{try{localStorage.setItem(K,JSON.stringify(D))}catch(e){}};
+
+/* achievements: id:[glyph,title,description,tier,target,teaser]. A teaser makes it hidden until unlocked. */
+const AC={
+s:['S','Found the S','You pressed the logo and walked in.','b'],
+tune:['⚙','Tinkerer','Change a setting. Yes, that counts.','b'],
+both:['2','Two-timer','Play both games. Neither will be jealous.','b'],
+owl:['☾','Night owl','Play between 1 and 5 AM.','s',0,'The moon has questions about your sleep schedule.'],
+leap:['↑','Leap of faith','Jump for the first time.','b'],
+coins:['●','Shiny things','Collect 100 coins.','b',100],
+squish:['▼','Squish','Stomp 25 enemies. They had families, probably.','b',25],
+flag:['⚑','Flag planter','Finish a level.','b'],
+pit:['↓','Gravity wins','Fall into a pit.','b',0,'Down is also a direction.'],
+skill:['✕','Skill issue','Lose 10 lives. It was the controller.','b',10,'Totally the controller. Definitely.'],
+l10:['10','Double digits','Reach level 10.','s'],
+l20:['20','The dice take over','Reach level 20, where the generator takes over.','g'],
+gen:['∞','Seed sower','Clear a generated level.','s'],
+pac:['☮','Pacifist','Clear a level without stomping anything.','s',0,'Violence is optional. Mostly.'],
+ign:['⚡','Ignition','Start your first drive.','b'],
+near:['≈','Close shave','Make a near miss.','b'],
+hair:['≋','Hairline','Chain 8 near misses.','s'],
+red:['◉','Redline','Hit 250 km/h.','g'],
+wreck:['✸','Not covered','Crash above 200 km/h.','s',0,'Your insurer would like a word.'],
+wrong:['⇅','Wrong way, right thrill','Near-miss 10 oncoming cars in Two-way.','g',10],
+tour:['◎','Tourist','Try all four camera angles.','b'],
+horn:['♪','Honk if you read this','Use the horn 10 times.','b',10,'Beep beep.'],
+burn:['▲','Burn it','Burn a full nitro tank in one run.','b'],
+haul:['→','Long haul','Drive 5 km in one run.','s'],
+dusk:['☼','Into the night','Drive until it gets dark.','s']};
+
+/* audio: everything is synthesised, no files */
+const A=(()=>{let c,mg,mb,sb,nb,tm=0,cur=null,eo=0,ef,eg;
+const ctx=()=>{if(!c){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;c=new C();mg=c.createGain();mg.connect(c.destination);mb=c.createGain();sb=c.createGain();mb.connect(mg);sb.connect(mg);nb=c.createBuffer(1,c.sampleRate,c.sampleRate);const d=nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;apply()}if(c.state!=='running')c.resume();return c};
+const apply=()=>{if(!c)return;mb.gain.value=D.c.music?.3:0;sb.gain.value=D.c.sfx?.8:0;if(!D.c.music){clearInterval(tm);tm=0}else if(cur&&!tm)loop()};
+const tone=(f,d,w='square',v=.15,f2=0,t=0,b)=>{if(!ctx())return;const o=c.createOscillator(),g=c.createGain(),s=c.currentTime+Math.max(0,t);o.type=w;o.frequency.setValueAtTime(f,s);if(f2)o.frequency.exponentialRampToValueAtTime(f2,s+d);g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g);g.connect(b||sb);o.start(s);o.stop(s+d+.03)};
+const noise=(d,v=.2,fq=2000,t=0,b)=>{if(!ctx())return;const s=c.currentTime+Math.max(0,t),n=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();n.buffer=nb;f.type='lowpass';f.frequency.value=fq;g.gain.setValueAtTime(v,s);g.gain.exponentialRampToValueAtTime(.001,s+d);n.connect(f);f.connect(g);g.connect(b||sb);n.start(s);n.stop(s+d)};
+const arp=(fs,d,w,v,gap)=>fs.forEach((f,i)=>tone(f,d,w,v,0,i*gap));
+const X={jump:()=>tone(330,.18,'square',.12,720),coin:()=>{tone(988,.08,'square',.1);tone(1319,.25,'square',.1,0,.07)},stomp:()=>{tone(220,.1,'square',.15,70);noise(.06,.15,1500)},bump:()=>tone(120,.08,'square',.18,80),die:()=>tone(500,.7,'sawtooth',.14,60),win:()=>arp([523,659,784,1047,1319],.25,'square',.12,.11),up:()=>arp([392,523,659,784],.12,'square',.1,.08),horn:()=>{tone(349,.4,'sawtooth',.1);tone(440,.4,'sawtooth',.1)},crash:()=>{noise(.9,.5,900);tone(90,.5,'sine',.4,30)},near:()=>tone(900,.12,'square',.08,1800),nitro:()=>noise(.6,.25,3500),click:()=>tone(660,.04,'square',.06),gear:()=>tone(180,.05,'square',.05),ach:()=>arp([784,988,1175,1568],.4,'sine',.14,.09)};
+const TR={run:{bpm:156,w:'square',L:'ehm.hmq.fjm.jmr.hlo.lot.emq.mqt.',B:'a.a.a.a.f.f.f.f.h.h.h.h.a.a.a.a.',dr:0},drive:{bpm:118,w:'sawtooth',L:'jmq.qmj.fjm.mjf.ehm.mhe.hlo.olh.',B:'jjjjjjjjffffffffaaaaaaaahhhhhhhh',dr:1}};
+const note=(T,s,t)=>{const n=c.currentTime,l=T.L[s],b=T.B[s],st=60/T.bpm/2;if(l!=='.')tone(262*2**((l.charCodeAt(0)-97)/12),st*.9,T.w,.09,0,t-n,mb);if(b!=='.')tone(131*2**((b.charCodeAt(0)-97)/12),st*.95,'triangle',.2,0,t-n,mb);if(T.dr?s%2===0:s%4===0)tone(150,.12,'sine',.4,45,t-n,mb);if(s%2)noise(.04,T.dr?.05:.03,7000,t-n,mb)};
+const loop=()=>{if(!ctx())return;const T=TR[cur];let i=0,nt=c.currentTime+.08;clearInterval(tm);tm=setInterval(()=>{while(nt<c.currentTime+.3){note(T,i%32,nt);nt+=60/T.bpm/2;i++}},70)};
+const music=n=>{cur=n;clearInterval(tm);tm=0;if(n&&D.c.music)loop()};
+const eng={start(){if(eo||!ctx())return;eo=[c.createOscillator(),c.createOscillator()];ef=c.createBiquadFilter();eg=c.createGain();eo[0].type='sawtooth';eo[1].type='square';ef.type='lowpass';eg.gain.value=0;eo.forEach(o=>{o.connect(ef);o.start()});ef.connect(eg);eg.connect(sb)},
+set(r,t){if(!eo)return;const f=34+r*105,n=c.currentTime;eo[0].frequency.setTargetAtTime(f,n,.03);eo[1].frequency.setTargetAtTime(f*.5,n,.03);ef.frequency.setTargetAtTime(280+t*900+r*700,n,.05);eg.gain.setTargetAtTime(.045+t*.05+r*.035,n,.05)},
+stop(){if(!eo)return;eo.forEach(o=>{try{o.stop()}catch(e){}});eg.disconnect();eo=0}};
+return{ctx,sfx:n=>{X[n]&&X[n]()},music,eng,apply}})();
+
+/* achievements and toasts */
+const Q=[];let busy=0;
+function pump(){if(busy||!Q.length)return;busy=1;const[g,t,d,tier]=Q.shift(),el=$('#tst');el.className='tst t-'+tier;el.innerHTML=`<span class="ic">${g}</span><div><small>Achievement unlocked</small><b>${t}</b><em>${d}</em></div>`;requestAnimationFrame(()=>el.classList.add('on'));setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{busy=0;pump()},650)},4200)}
+function unlock(id){if(D.a[id]||!AC[id])return;D.a[id]=Date.now();save();Q.push(AC[id]);pump();A.sfx('ach');paintA()}
+function add(id,n=1){D.s[id]=(D.s[id]||0)+n;save();const t=AC[id]&&AC[id][4];if(t&&D.s[id]>=t)unlock(id);else paintA();return D.s[id]}
+function paintA(){const ids=Object.keys(AC),n=ids.filter(i=>D.a[i]).length,rank=i=>D.a[i]?0:AC[i][5]?2:1;
+$('#cnt').textContent=`${n} of ${ids.length} (${Math.round(n/ids.length*100)}%)`;$('#bar').style.width=n/ids.length*100+'%';
+ids.sort((a,b)=>rank(a)-rank(b)||(D.a[b]||0)-(D.a[a]||0));
+$('#al').innerHTML=ids.map(i=>{const[g,t,d,tier,tg,hint]=AC[i],on=D.a[i],hid=!on&&hint,cur=D.s[i]||0;
+return`<li class="${on?'on ':''}t-${tier}"><span class="ic">${hid?'?':g}</span><div><b>${hid?'Hidden achievement':t}</b><small>${hid?hint:d}</small></div><span class="mt">${on?new Date(on).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):hid?'':tg?Math.min(cur,tg)+' / '+tg:''}</span></li>`}).join('')}
+function paintB(){$('[data-b=platformer]').textContent=D.b.platformer?'Furthest level cleared: '+D.b.platformer:'No level cleared yet';$('[data-b=racer]').textContent=D.b.racer?'Best score: '+D.b.racer.toLocaleString():'No run yet'}
+
+/* settings strip, reused inside the games */
+const CY={q:['low','med','high'],scale:[.5,.75,1,1.25,1.5]},LB={music:v=>'Music: '+(v?'on':'off'),sfx:v=>'Sound: '+(v?'on':'off'),q:v=>'Graphics: '+{low:'low',med:'medium',high:'high'}[v],scale:v=>'Resolution: '+Math.round(v*100)+'%'};
+const strip=g=>`<div class="strip">${['music','sfx',...(g?['q','scale']:[])].map(k=>`<button type="button" data-k="${k}">${LB[k](D.c[k])}</button>`).join('')}</div>`;
+const L=[];
+document.addEventListener('click',e=>{
+const b=e.target.closest('[data-k]');
+if(b){const k=b.dataset.k,c=CY[k];D.c[k]=c?c[(c.indexOf(D.c[k])+1)%c.length]:!D.c[k];save();A.apply();document.querySelectorAll('[data-k]').forEach(x=>x.textContent=LB[x.dataset.k](D.c[x.dataset.k]));L.forEach(f=>f());A.sfx('click');unlock('tune');return}
+const g=e.target.closest('[data-g]');if(g)launch(g.dataset.g);
+if(e.target.closest('[data-x]'))exit()});
+$('#cfg').onclick=()=>{$('#sp').innerHTML=strip(1);$('#dlg').showModal()};$('#cl').onclick=()=>$('#dlg').close();
+$('#rs').onclick=()=>{if(confirm('Erase all achievements and scores?')){D.a={};D.s={};D.b={};save();paintA();paintB()}};
+
+/* game host */
+let stop=null;
+const api={cfg:D.c,unlock,add,get:k=>D.s[k]||0,put:(k,v)=>{D.s[k]=v;save()},best(g,v){if(v>(D.b[g]||0)){D.b[g]=v;save();return true}return false},getBest:g=>D.b[g]||0,sfx:A.sfx,music:A.music,eng:A.eng,strip,on:f=>{L.push(f);return()=>{const i=L.indexOf(f);if(i>-1)L.splice(i,1)}},exit:()=>exit()};
+async function launch(n){
+$('#stage').hidden=false;document.body.style.overflow='hidden';const h=$('#host');h.innerHTML='<p class="ld">Loading…</p>';A.ctx();
+const hr=new Date().getHours();if(hr>=1&&hr<5)unlock('owl');
+D.s['p_'+n]=1;save();if(D.s.p_platformer&&D.s.p_racer)unlock('both');
+try{const m=await import('./'+n+'.js');h.innerHTML='';stop=await m.default(h,api)}
+catch(e){console.error(e);h.innerHTML='<p class="ld">This game could not load. Check your connection and try again.<button class="bt" data-x type="button">Back</button></p>'}}
+function exit(){try{stop&&stop()}catch(e){}stop=null;A.music(null);A.eng.stop();$('#host').innerHTML='';$('#stage').hidden=true;document.body.style.overflow='';paintA();paintB()}
+paintA();paintB();unlock('s');
+</script>
+</body>
+</html>
