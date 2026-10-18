@@ -123,6 +123,9 @@ footer{border-top:1px solid var(--line);padding:1.75rem 0 2.5rem;color:var(--mut
 .facts dt{color:var(--mut);font-size:.85rem}
 .facts dd{margin:.1rem 0 0;font-weight:600}
 button.btn{font:600 1rem var(--sys);background:none;cursor:pointer}
+.slogo{position:relative;display:inline-grid;place-items:center;width:3.1rem;height:3.1rem;margin-left:.7rem;vertical-align:middle;border-radius:50%;border:1px solid var(--line2);color:var(--ink);font:800 1.7rem/1 var(--disp);text-decoration:none;transition:background .2s,color .2s,transform .1s}
+.slogo::after{content:"";position:absolute;right:.6rem;bottom:.6rem;width:.28rem;height:.28rem;background:var(--acc)}
+.slogo:hover{background:var(--acc);border-color:var(--acc);color:var(--on-acc)}.slogo:hover::after{background:var(--on-acc)}.slogo:active{transform:scale(.94)}
 :root{--tl:22%}
 :root[data-theme="light"]{--tl:86%}
 .sheet{position:fixed;inset:0;z-index:90;display:flex;align-items:flex-end;justify-content:center}
@@ -224,7 +227,7 @@ footer a:hover{color:var(--ink)}
         <p>What pulls me in is the part after the demo: making a model work reliably, affordably, and safely for real people. That's why my plan includes deployment, evaluation, and monitoring, not only prompts.</p>
         <p>This site keeps me honest. The roadmap shows what I intend to learn, and the build log will show what I actually finished.</p>
         <dl class="facts"><div><dt>Focus</dt><dd>AI engineering</dd></div><div><dt>Stage</dt><dd>1 of 11, Python for AI</dd></div><div><dt>Goal</dt><dd>AI systems that work in production</dd></div><div><dt>Open to</dt><dd>Advice and study partners</dd></div></dl>
-        <div class="btns"><button class="btn" id="beyond" type="button" aria-haspopup="dialog">Beyond the code: games and books</button></div>
+        <div class="btns"><button class="btn" id="beyond" type="button" aria-haspopup="dialog">Beyond the code: games and books</button><a class="slogo" href="space/" aria-label="Open Stellar’s Space, the games page" title="Stellar’s Space">S</a></div>
       </div>
     </div>
   </section>
