@@ -4,7 +4,7 @@ export default function(root,api){
 const TS=16,VW=320,VH=192,GY=10,STEP=1/120,cl=(v,a,b)=>Math.min(b,Math.max(a,v));
 const cv=document.createElement('canvas');cv.width=VW;cv.height=VH;
 cv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;image-rendering:pixelated;background:#000';
-const X=cv.getContext('2d');
+const X=cv.getContext('2d');let U=null,ul=0;
 const ui=document.createElement('div');ui.style.cssText='position:absolute;inset:0;pointer-events:none';
 ui.innerHTML=`<style>.tb{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);width:64px;height:64px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(20,21,23,.55);color:#fff;font:700 16px system-ui;display:grid;place-items:center;pointer-events:auto;touch-action:none;user-select:none;-webkit-user-select:none}</style><button class="bt" data-a="pause" type="button" style="pointer-events:auto;position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;margin:0">Pause</button><div class="ov" style="display:none;pointer-events:auto"></div><div class="tc" style="display:none"><b class="tb" data-t="l" style="left:14px">◀</b><b class="tb" data-t="r" style="left:88px">▶</b><b class="tb" data-t="d" style="right:96px;bottom:calc(env(safe-area-inset-bottom,0px) + 90px);width:52px;height:52px">Dash</b><b class="tb" data-t="n" style="right:96px;width:52px;height:52px">Run</b><b class="tb" data-t="j" style="right:14px">Jump</b></div>`;
 root.append(cv,ui);
@@ -18,7 +18,7 @@ const keys={},T={},tos=[],later=(f,ms)=>tos.push(setTimeout(f,ms)),qs=+new URLSe
 if(qs)lv=qs;
 const solid=(x,y)=>x<0||x>=W||(y>=0&&y<12&&g[y][x]!==' '&&g[y][x]!=='S');
 const puff=(x,y,n,c,sp=40)=>{for(let i=0;i<n;i++)pt.push({x,y,vx:(Math.random()-.5)*sp,vy:-Math.random()*sp*.7,t:.25+Math.random()*.3,c})};
-function tryDash(){if(st!=='play'||dcd>0||dsh>0)return;dsh=.18;dcd=.7;p.vx=p.f*230;p.vy=Math.min(p.vy,0)*.2;shk=2;puff(p.x+6,p.y+12,8,'#cfe9ff',70);api.sfx('nitro')}
+function tryDash(){if(st!=='play'||dcd>0||dsh>0)return;dsh=.18;dcd=.7;p.vx=p.f*230;p.vy=Math.min(p.vy,0)*.2;shk=2;puff(p.x+6,p.y+12,8,'#cfe9ff',70);api.sfx('nitro');api.add('dash')}
 
 /* physics: axis-separated tile collision */
 function move(o,dt){
@@ -60,14 +60,14 @@ function load(ns){if(ns)seed=lv<20?lv*7919+13:Math.random()*1e9|0;ti=(lv-1>>2)%4
 const show=h=>{ov.innerHTML=h?`<div>${h}</div>`:'';ov.style.display=h?'grid':'none'};
 const J=()=>keys.ArrowUp||keys.KeyW||keys.Space||keys.KeyZ||T.j,Lf=()=>keys.ArrowLeft||keys.KeyA||T.l,Rt=()=>keys.ArrowRight||keys.KeyD||T.r,RN=()=>keys.ShiftLeft||keys.ShiftRight||keys.KeyX||T.n;
 function title(){load(1);st='title';paused=false;const rc=reached();api.music('run');
- show(`<h3>Star Run</h3><p>Level <b>${lv}</b>${rc>1?' (furthest: '+rc+')':''}</p><p>${lv>=20?'Generated level. New seed every run.':'Curated world. Same every time.'}</p><p>Arrows or A/D move. Space or W jumps. Hold Shift to run. Press K or C to dash through enemies. Stomp most enemies from above, but not spiked ones. Springs launch you, spikes hurt, cracked floors fall.</p><div class="row"><button class="bt pri" data-a="go" type="button">Start level ${lv}</button>${rc>1?'<button class="bt" data-a="prev" type="button">◀ Level</button><button class="bt" data-a="next" type="button">Level ▶</button>':''}</div>${api.strip()}`)}
+ show(`<h3>Star Run</h3><p>Level <b>${lv}</b>${rc>1?' (furthest: '+rc+')':''}</p><p>${lv>=20?'Generated level. New seed every run.':'Curated world. Same every time.'}</p><p>Arrows or A/D move. Space or W jumps. Hold Shift to run. Press K or C to dash through enemies. Stomp most enemies from above, but not spiked ones. Springs launch you, spikes hurt, cracked floors fall.</p><div class="row"><button class="bt pri" data-a="go" type="button">Start level ${lv}</button>${rc>1?'<button class="bt" data-a="prev" type="button">◀ Level</button><button class="bt" data-a="next" type="button">Level ▶</button>':''}</div>${api.strip(2)}`)}
 function go(){if(st==='over'){lives=3;score=0;load(0)}if(lv>=10)api.unlock('l10');if(lv>=20)api.unlock('l20');st='play';paused=false;time=tmax;show('');api.music('run')}
-function pause(on){if(st!=='play')return;paused=on;show(on?`<h3>Paused</h3><div class="row"><button class="bt pri" data-a="res" type="button">Resume</button><button class="bt" data-a="menu" type="button">Level select</button><button class="bt" data-a="exit" type="button">Exit</button></div>${api.strip()}`:'')}
+function pause(on){if(st!=='play')return;paused=on;show(on?`<h3>Paused</h3><div class="row"><button class="bt pri" data-a="res" type="button">Resume</button><button class="bt" data-a="menu" type="button">Level select</button><button class="bt" data-a="exit" type="button">Exit</button></div>${api.strip(2)}`:'')}
 function die(w){if(st!=='play')return;st='dead';p.vy=-250;p.vx=0;lives--;api.add('skill');api.sfx('die');api.music(null);if(w==='pit')api.unlock('pit');
  later(()=>{if(st!=='dead')return;if(lives>0){load(0);go()}else{st='over';show(`<h3>Game over</h3><p>Score <b>${score.toLocaleString()}</b></p><p>Reached level ${lv}</p><div class="row"><button class="bt pri" data-a="go" type="button">Try level ${lv} again</button><button class="bt" data-a="menu" type="button">Level select</button><button class="bt" data-a="exit" type="button">Exit</button></div>`)}},1700)}
 function win(){if(st!=='play')return;st='clear';api.music(null);api.sfx('win');bonus=Math.floor(time)*5;score+=bonus;api.unlock('flag');if(lv>=20)api.unlock('gen');if(!stomped&&en.length>=3)api.unlock('pac');
  api.put('reached',Math.max(api.get('reached'),lv+1));api.best('platformer',lv);later(()=>{lv++;load(1);go()},3200)}
-function getCoin(pts){coins++;score+=pts;api.add('coins');if(coins%100===0){lives++;api.sfx('up')}}
+function getCoin(pts){coins++;score+=pts;api.add('coins');api.add('rich');if(coins%100===0){lives++;api.sfx('up')}}
 function bump(x,y){const ch=g[y][x];if(ch==='?'){g[y][x]='b';fx.push({x:x*TS+8,y:y*TS-4,vy:-170,t:.5});getCoin(200);api.sfx('coin')}else api.sfx('bump');
  for(const e of en)if(!e.k&&Math.abs(e.x+7-(x*TS+8))<12&&Math.abs(e.y+e.h-y*TS)<3){e.k=1;e.t=.4;score+=100}}
 
@@ -161,7 +161,8 @@ function bg(){
   else if(ti===2){R(px,by-hg-14,9,hg+14,'rgba(10,14,40,.7)');for(let j=0;j<4;j++)if(((n+j)*7)&1)R(px+2,by-hg-10+j*7,2,2,'rgba(255,214,120,.8)')}
   else{X.fillStyle='rgba(255,120,40,.35)';X.beginPath();X.moveTo(px,by);X.lineTo(px+5,by-hg-10);X.lineTo(px+11,by);X.fill()}}}
 function draw(){
- bg();
+ const uq=api.cfg.q==='ultra';if(uq&&!U&&!ul){ul=1;import('./ultra2d.js').then(m=>{U=m.default(cv,X,VW,VH)}).catch(e=>{ul=2;console.warn('Ultra mode could not load',e)})}if(U)U.pre(uq);
+ bg();if(U&&uq)U.far(cx,th,ti);
  if(g.length){
   const ox=Math.round(cx),sx=shk>.1?Math.round((Math.random()-.5)*shk):0,sy=shk>.1?Math.round((Math.random()-.5)*shk):0;X.save();X.translate(-ox+sx,sy);
   const c0=Math.max(0,ox/TS|0),c1=Math.min(W-1,c0+VW/TS+1);
@@ -174,6 +175,7 @@ function draw(){
   drawStellar(Math.round(p.x),Math.round(p.y));
   for(const q of pt)R(Math.round(q.x),Math.round(q.y),2,2,q.c);
   X.restore()}
+ if(U&&uq)U.post({ox:Math.round(cx),p,co,shots,flagX,ti,th,t:anim});
  X.shadowColor='#000';X.shadowOffsetX=1;X.shadowOffsetY=1;X.fillStyle='#fff';X.font='bold 9px monospace';X.textBaseline='top';X.textAlign='left';
  X.fillText('LV '+lv,6,6);X.fillText('SCORE '+String(score).padStart(6,'0'),40,6);X.fillText('● '+coins,124,6);X.fillText('♥ '+lives,160,6);X.fillText('TIME '+Math.max(0,Math.ceil(time)),196,6);
  X.shadowColor='transparent';X.shadowOffsetX=X.shadowOffsetY=0;R(196,17,44,3,'rgba(255,255,255,.2)');R(196,17,44*(1-Math.max(0,dcd)/.7),3,dcd>0?'#6a8aa0':'#6ad7ff');
