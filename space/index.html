@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Stellar’s Space | Kaustubh Niroula</title>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
@@ -53,6 +54,14 @@ dialog h3{font:800 2.2rem/1 var(--d);text-transform:uppercase;margin:0 0 .4rem}.
 .bt{font:600 .92rem system-ui;color:var(--ink);padding:.6rem 1.1rem;border-radius:99px;border:1px solid rgba(255,255,255,.28);background:rgba(20,21,23,.7);cursor:pointer;margin:.25rem}.bt:hover{border-color:var(--acc)}.bt.pri{background:var(--acc);border-color:var(--acc);color:#fff}
 .row{display:flex;gap:.5rem;justify-content:center;align-items:center;flex-wrap:wrap;margin:.5rem 0}
 .strip{display:flex;gap:.4rem;justify-content:center;flex-wrap:wrap;margin-top:.8rem}.strip button{font:500 .8rem system-ui;color:#b9bcc2;padding:.4rem .8rem;border-radius:99px;border:1px solid var(--line);background:none;cursor:pointer}.strip button:hover{color:var(--ink);border-color:var(--acc)}
+#sky{position:fixed;inset:0;z-index:0;pointer-events:none}.w{position:relative;z-index:1}#fx{position:fixed;inset:0;z-index:400;pointer-events:none}
+.tst{overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.55),0 0 0 1px var(--c),0 0 40px -8px var(--c)}
+.tst::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.3) 50%,transparent 65%);transform:translateX(-130%);pointer-events:none}
+.tst.on::after{animation:shn 1.1s .4s ease-out}.tst.on .ic{animation:pop .75s cubic-bezier(.2,1.7,.4,1) .15s both}
+@keyframes shn{to{transform:translateX(130%)}}@keyframes pop{0%{transform:scale(.2) rotate(-50deg);opacity:0}100%{transform:none;opacity:1}}
+.al li.new{animation:nw 2.2s ease-out}@keyframes nw{0%,35%{box-shadow:0 0 0 2px var(--c),0 0 30px var(--c);transform:scale(1.03)}100%{box-shadow:0 0 0 0 transparent;transform:none}}
+.pg i{position:relative;overflow:hidden}.pg i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%);animation:shm 2.8s ease-in-out infinite}@keyframes shm{60%,100%{transform:translateX(100%)}}
+@media(prefers-reduced-motion:reduce){.tst.on::after,.tst.on .ic,.al li.new,.pg i::after{animation:none}}
 </style>
 </head>
 <body>
@@ -62,7 +71,7 @@ dialog h3{font:800 2.2rem/1 var(--d);text-transform:uppercase;margin:0 0 .4rem}.
 <p class="lead">Two games and a trophy case. Scores, settings and achievements save in this browser.</p>
 <div class="gm">
 <button class="gc" data-g="platformer" type="button"><i class="art a2"></i><b>Star Run</b><span>Side-scrolling platformer. Curated worlds up to level 19, then a level generator that never runs out and never builds an impossible jump.</span><em data-b="platformer"></em></button>
-<button class="gc" data-g="racer" type="button"><i class="art a3"></i><b>Stellar Drive</b><span>3D highway racing. Four cameras, nitro, one-way or two-way traffic, and drivers that brake, signal and change lanes.</span><em data-b="racer"></em></button>
+<button class="gc" data-g="racer" type="button"><i class="art a3"></i><b>Stellar Drive</b><span>3D highway racing. Four cameras, nitro, one-way or two-way traffic, and drivers that brake, signal and change lanes. Ultra graphics adds five maps, houses, a river and detailed trees.</span><em data-b="racer"></em></button>
 </div>
 <div class="ah"><h2>Achievements</h2><span id="cnt"></span></div>
 <div class="pg"><i id="bar"></i></div>
@@ -70,7 +79,7 @@ dialog h3{font:800 2.2rem/1 var(--d);text-transform:uppercase;margin:0 0 .4rem}.
 </div>
 <div id="stage" hidden><div id="host"></div></div>
 <div class="tst" id="tst" aria-live="polite"></div>
-<dialog id="dlg"><h3>Settings</h3><p class="dm">Graphics and resolution apply to Stellar Drive. Music and sound apply to both games.</p><div id="sp"></div><div class="row"><button class="pill" id="rs" type="button">Reset progress</button><button class="pill" id="cl" type="button">Close</button></div></dialog>
+<dialog id="dlg"><h3>Settings</h3><p class="dm">Graphics apply to both games, resolution to Stellar Drive. Ultra adds five maps, houses, a river and detailed trees to the 3D game, and a lit, parallax look to Star Run.</p><div id="sp"></div><div class="row"><button class="pill" id="rs" type="button">Reset progress</button><button class="pill" id="cl" type="button">Close</button></div></dialog>
 <script type="module">
 const $=s=>document.querySelector(s),K='stellar-space-v2';
 let D={};try{D=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
@@ -103,7 +112,14 @@ tour:['◎','Tourist','Try all four camera angles.','b'],
 horn:['♪','Honk if you read this','Use the horn 10 times.','b',10,'Beep beep.'],
 burn:['▲','Burn it','Burn a full nitro tank in one run.','b'],
 haul:['→','Long haul','Drive 5 km in one run.','s'],
-dusk:['☼','Into the night','Drive until it gets dark.','s']};
+dusk:['☼','Into the night','Drive until it gets dark.','s'],
+eye:['◐','Eye candy','Switch Graphics to Ultra.','b'],
+glow:['✦','Glow up','Play Star Run on Ultra graphics.','b'],
+graze:['⌁','Paint swap','Scrape a car and keep driving.','b'],
+globe:['◍','Globetrotter','Drive through all five maps in Stellar Drive.','s',0,'There is more road than the meadow.'],
+rich:['$','Moneybags','Collect 500 coins in total.','s',500],
+dash:['»','Quick feet','Dash 25 times.','b',25],
+plat:['★','Stellar','Unlock every other achievement.','g',0,'You will know when you get there.']};
 
 /* audio: everything is synthesised, no files */
 const A=(()=>{let c,mg,mb,sb,nb,tm=0,cur=null,eo=0,ef,eg;
@@ -122,25 +138,44 @@ set(r,t){if(!eo)return;const f=34+r*105,n=c.currentTime;eo[0].frequency.setTarge
 stop(){if(!eo)return;eo.forEach(o=>{try{o.stop()}catch(e){}});eg.disconnect();eo=0}};
 return{ctx,sfx:n=>{X[n]&&X[n]()},music,eng,apply}})();
 
+/* animated star sky behind the page, and the confetti that bursts from achievement toasts */
+const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,RK=['Rookie','Cadet','Pilot','Navigator','Ace','Commander','Legend'],PC={b:['#c98450','#ffb37a','#fff3e0'],s:['#c3c8d0','#7fd1ff','#ffffff'],g:['#ffc83d','#ff3b3b','#fff3a0','#6ad7ff']};
+const sky=document.createElement('canvas'),sx=sky.getContext('2d'),fx=document.createElement('canvas'),fc=fx.getContext('2d');sky.id='sky';fx.id='fx';document.body.prepend(sky);document.body.append(fx);
+let SW=0,SH=0,ST=[],ss=null,CP=[];
+function sizeSky(){SW=sky.width=innerWidth;SH=sky.height=innerHeight;ST=Array.from({length:Math.round(SW*SH/8000)},()=>[Math.random()*SW,Math.random()*SH,Math.random()*1.5+.4,Math.random()*6.28]);if(RM)skyF(0)}
+function skyF(t){if(!RM&&!$('#stage').hidden){requestAnimationFrame(skyF);return}sx.clearRect(0,0,SW,SH);sx.fillStyle='#fff';
+ for(const s of ST){sx.globalAlpha=RM?.5:.2+.6*Math.abs(Math.sin(t/1300+s[3]));sx.fillRect(s[0],(s[1]-scrollY*.06*s[2]+SH*4)%SH,s[2],s[2])}
+ if(!RM){if(!ss&&Math.random()<.003)ss={x:Math.random()*SW*.8,y:Math.random()*SH*.35,l:0};
+  if(ss){ss.l+=.03;const a=Math.sin(Math.min(ss.l,1)*Math.PI),x=ss.x+ss.l*260,y=ss.y+ss.l*110,g=sx.createLinearGradient(x,y,x-90,y-38);g.addColorStop(0,`rgba(255,255,255,${a})`);g.addColorStop(1,'rgba(255,255,255,0)');sx.globalAlpha=1;sx.strokeStyle=g;sx.lineWidth=1.6;sx.beginPath();sx.moveTo(x,y);sx.lineTo(x-90,y-38);sx.stroke();if(ss.l>=1)ss=null}
+  requestAnimationFrame(skyF)}}
+addEventListener('resize',sizeSky);sizeSky();if(!RM)requestAnimationFrame(skyF);
+function burst(col,n){if(RM)return;fx.width=innerWidth;fx.height=innerHeight;const was=CP.length;
+ for(let i=0;i<n;i++){const a=-Math.PI/2+(Math.random()-.5)*2.6,s=5+Math.random()*12;CP.push({x:innerWidth-110,y:innerHeight-90,vx:Math.cos(a)*s,vy:Math.sin(a)*s,r:Math.random()*6,vr:(Math.random()-.5)*.45,w:4+Math.random()*5,c:col[i%col.length],t:1})}if(!was)cf()}
+function cf(){fc.clearRect(0,0,fx.width,fx.height);CP=CP.filter(p=>p.t>0&&p.y<fx.height+20);
+ for(const p of CP){p.vy+=.34;p.vx*=.985;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.t-=.011;fc.save();fc.globalAlpha=Math.min(1,p.t*2);fc.translate(p.x,p.y);fc.rotate(p.r);fc.fillStyle=p.c;fc.fillRect(-p.w/2,-p.w/4,p.w,p.w/2);fc.restore()}
+ if(CP.length)requestAnimationFrame(cf);else fc.clearRect(0,0,fx.width,fx.height)}
+const rk=()=>{const k=Object.keys(AC);return Math.floor(k.filter(i=>D.a[i]).length/k.length*(RK.length-1)+1e-9)};
+let fresh='';
+
 /* achievements and toasts */
 const Q=[];let busy=0;
-function pump(){if(busy||!Q.length)return;busy=1;const[g,t,d,tier]=Q.shift(),el=$('#tst');el.className='tst t-'+tier;el.innerHTML=`<span class="ic">${g}</span><div><small>Achievement unlocked</small><b>${t}</b><em>${d}</em></div>`;requestAnimationFrame(()=>el.classList.add('on'));setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{busy=0;pump()},650)},4200)}
-function unlock(id){if(D.a[id]||!AC[id])return;D.a[id]=Date.now();save();Q.push(AC[id]);pump();A.sfx('ach');paintA()}
+function pump(){if(busy||!Q.length)return;busy=1;const[g,t,d,tier,lb]=Q.shift(),el=$('#tst');el.className='tst t-'+tier;el.innerHTML=`<span class="ic">${g}</span><div><small>${lb||'Achievement unlocked'}</small><b>${t}</b><em>${d}</em></div>`;requestAnimationFrame(()=>{el.classList.add('on');burst(PC[tier],tier==='g'?150:tier==='s'?95:60)});setTimeout(()=>{el.classList.remove('on');setTimeout(()=>{busy=0;pump()},650)},4200)}
+function unlock(id){if(D.a[id]||!AC[id])return;const r0=rk();D.a[id]=Date.now();fresh=id;save();Q.push(AC[id]);const r1=rk();if(r1>r0)Q.push(['★','Rank up: '+RK[r1],'Your trophy case just levelled up.','g','New rank']);pump();A.sfx('ach');paintA();if(id!=='plat'&&Object.keys(AC).every(k=>k==='plat'||D.a[k]))unlock('plat')}
 function add(id,n=1){D.s[id]=(D.s[id]||0)+n;save();const t=AC[id]&&AC[id][4];if(t&&D.s[id]>=t)unlock(id);else paintA();return D.s[id]}
 function paintA(){const ids=Object.keys(AC),n=ids.filter(i=>D.a[i]).length,rank=i=>D.a[i]?0:AC[i][5]?2:1;
-$('#cnt').textContent=`${n} of ${ids.length} (${Math.round(n/ids.length*100)}%)`;$('#bar').style.width=n/ids.length*100+'%';
+$('#cnt').textContent=`${n} of ${ids.length} (${Math.round(n/ids.length*100)}%) · ${RK[rk()]}`;$('#bar').style.width=n/ids.length*100+'%';
 ids.sort((a,b)=>rank(a)-rank(b)||(D.a[b]||0)-(D.a[a]||0));
 $('#al').innerHTML=ids.map(i=>{const[g,t,d,tier,tg,hint]=AC[i],on=D.a[i],hid=!on&&hint,cur=D.s[i]||0;
-return`<li class="${on?'on ':''}t-${tier}"><span class="ic">${hid?'?':g}</span><div><b>${hid?'Hidden achievement':t}</b><small>${hid?hint:d}</small></div><span class="mt">${on?new Date(on).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):hid?'':tg?Math.min(cur,tg)+' / '+tg:''}</span></li>`}).join('')}
+return`<li class="${on?'on ':''}${i===fresh?'new ':''}t-${tier}"><span class="ic">${hid?'?':g}</span><div><b>${hid?'Hidden achievement':t}</b><small>${hid?hint:d}</small></div><span class="mt">${on?new Date(on).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):hid?'':tg?Math.min(cur,tg)+' / '+tg:''}</span></li>`}).join('');fresh=''}
 function paintB(){$('[data-b=platformer]').textContent=D.b.platformer?'Furthest level cleared: '+D.b.platformer:'No level cleared yet';$('[data-b=racer]').textContent=D.b.racer?'Best score: '+D.b.racer.toLocaleString():'No run yet'}
 
 /* settings strip, reused inside the games */
-const CY={q:['low','med','high'],scale:[.5,.75,1,1.25,1.5]},LB={music:v=>'Music: '+(v?'on':'off'),sfx:v=>'Sound: '+(v?'on':'off'),q:v=>'Graphics: '+{low:'low',med:'medium',high:'high'}[v],scale:v=>'Resolution: '+Math.round(v*100)+'%'};
-const strip=g=>`<div class="strip">${['music','sfx',...(g?['q','scale']:[])].map(k=>`<button type="button" data-k="${k}">${LB[k](D.c[k])}</button>`).join('')}</div>`;
+const CY={q:['low','med','high','ultra'],scale:[.5,.75,1,1.25,1.5]},LB={music:v=>'Music: '+(v?'on':'off'),sfx:v=>'Sound: '+(v?'on':'off'),q:v=>'Graphics: '+{low:'low',med:'medium',high:'high',ultra:'ultra'}[v],scale:v=>'Resolution: '+Math.round(v*100)+'%'};
+const strip=g=>`<div class="strip">${['music','sfx',...(g===2?['q']:g?['q','scale']:[])].map(k=>`<button type="button" data-k="${k}">${LB[k](D.c[k])}</button>`).join('')}</div>`;
 const L=[];
 document.addEventListener('click',e=>{
 const b=e.target.closest('[data-k]');
-if(b){const k=b.dataset.k,c=CY[k];D.c[k]=c?c[(c.indexOf(D.c[k])+1)%c.length]:!D.c[k];save();A.apply();document.querySelectorAll('[data-k]').forEach(x=>x.textContent=LB[x.dataset.k](D.c[x.dataset.k]));L.forEach(f=>f());A.sfx('click');unlock('tune');return}
+if(b){const k=b.dataset.k,c=CY[k];D.c[k]=c?c[(c.indexOf(D.c[k])+1)%c.length]:!D.c[k];save();A.apply();document.querySelectorAll('[data-k]').forEach(x=>x.textContent=LB[x.dataset.k](D.c[x.dataset.k]));L.forEach(f=>f());A.sfx('click');unlock('tune');if(D.c.q==='ultra')unlock('eye');return}
 const g=e.target.closest('[data-g]');if(g)launch(g.dataset.g);
 if(e.target.closest('[data-x]'))exit()});
 $('#cfg').onclick=()=>{$('#sp').innerHTML=strip(1);$('#dlg').showModal()};$('#cl').onclick=()=>$('#dlg').close();
@@ -152,7 +187,7 @@ const api={cfg:D.c,unlock,add,get:k=>D.s[k]||0,put:(k,v)=>{D.s[k]=v;save()},best
 async function launch(n){
 $('#stage').hidden=false;document.body.style.overflow='hidden';const h=$('#host');h.innerHTML='<p class="ld">Loading…</p>';A.ctx();
 const hr=new Date().getHours();if(hr>=1&&hr<5)unlock('owl');
-D.s['p_'+n]=1;save();if(D.s.p_platformer&&D.s.p_racer)unlock('both');
+D.s['p_'+n]=1;save();if(D.s.p_platformer&&D.s.p_racer)unlock('both');if(D.c.q==='ultra'){unlock('eye');if(n==='platformer')unlock('glow')}
 try{const m=await import('./'+n+'.js');h.innerHTML='';stop=await m.default(h,api)}
 catch(e){console.error(e);h.innerHTML='<p class="ld">This game could not load. Check your connection and try again.<button class="bt" data-x type="button">Back</button></p>'}}
 function exit(){try{stop&&stop()}catch(e){}stop=null;A.music(null);A.eng.stop();$('#host').innerHTML='';$('#stage').hidden=true;document.body.style.overflow='';paintA();paintB()}
