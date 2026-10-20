@@ -42,7 +42,7 @@ const ENVM=[];
 
 /* ---------- vehicle models ---------- */
 const GL=new MeshStandardMaterial({color:0x2d4558,roughness:.03,metalness:1}),CBN=new MeshStandardMaterial({color:0x101113,roughness:.4,metalness:.35}),CHR=new MeshStandardMaterial({color:0xdde2e8,roughness:.1,metalness:1}),PLT=new MeshStandardMaterial({color:0xf2f2ee,roughness:.6}),TRM=new MeshLambertMaterial({color:0x0d0e10}),RMM=new MeshStandardMaterial({color:0xb9bec6,roughness:.45,metalness:.1}),DKM=new MeshLambertMaterial({color:0x1a1c20}),HLM=new MeshBasicMaterial({color:0xfff4d2});
-ENVM.push(GL,CHR,CBN);const paint=c=>{const m=cfg.q==='high'?new MeshPhysicalMaterial({color:c,roughness:.32,metalness:.5,clearcoat:1,clearcoatRoughness:.1}):new MeshStandardMaterial({color:c,roughness:.3,metalness:.5});ENVM.push(m);return m};
+ENVM.push(GL,CHR,CBN);const paint=c=>{const m=cfg.q==='high'||cfg.q==='ultra'?new MeshPhysicalMaterial({color:c,roughness:.32,metalness:.5,clearcoat:1,clearcoatRoughness:.1}):new MeshStandardMaterial({color:c,roughness:.3,metalness:.5});ENVM.push(m);return m};
 const shp=p=>{const s=new Shape();p.forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));return s};
 function ext(p,w,m,b=.07){const g=new ExtrudeGeometry(shp(p),{depth:w-2*b,bevelEnabled:true,bevelThickness:b,bevelSize:b,bevelSegments:2});g.translate(0,0,-(w-2*b)/2);g.rotateY(Math.PI/2);return new Mesh(g,m)}
 /* [length,width,beltline,roof,hood,cabin,windshield rake,rear rake,trunk drop] */
@@ -141,10 +141,13 @@ const keys={},tp={},tried=new Set(),LX=[-5.4,-1.8,1.8,5.4],CAMS=['Chase','Far ch
 const camPos=new Vector3(0,3,8.6),camLook=new Vector3(0,1,-20),tv=new Vector3(),tl=new Vector3();
 
 /* graphics settings: quality and render resolution apply live */
-const PRs={low:.7,med:1,high:Math.min(devicePixelRatio||1,2)};
-function applyG(){const q=cfg.q,hi=q==='high',w=root.clientWidth||1,h=root.clientHeight||1,was=R.shadowMap.enabled;
+const PRs={low:.7,med:1,high:Math.min(devicePixelRatio||1,2),ultra:Math.min(devicePixelRatio||1,2)};
+let UL=null,ULp=0,mapSel=+api.get('map')||0,seen=api.get('maps')|0;const MAPN=['Auto','Meadow','Alpine','Coast','Desert','Downtown'];
+function applyG(){const q=cfg.q,hi=q==='high'||q==='ultra',w=root.clientWidth||1,h=root.clientHeight||1,was=R.shadowMap.enabled,tm=q==='ultra'?T.ACESFilmicToneMapping:T.NoToneMapping;
  R.setPixelRatio(cl(PRs[q]*cfg.scale,.3,3));R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();
- R.shadowMap.enabled=sun.castShadow=hi;if(was!==hi)sc.traverse(o=>{if(o.material)o.material.needsUpdate=true});
+ R.shadowMap.enabled=sun.castShadow=hi;if(was!==hi||R.toneMapping!==tm){R.toneMapping=tm;R.toneMappingExposure=1.1;sc.traverse(o=>{if(o.material)o.material.needsUpdate=true})}
+ if(q==='ultra'&&!UL&&!ULp){ULp=1;import('./ultra3d.js').then(m=>m.default(T,sc,R,cam,{ground,ENVM})).then(u=>{UL=u;u.map(mapSel);applyG()}).catch(e=>{ULp=0;cfg.q='high';console.warn('Ultra mode could not load',e);applyG()})}
+ if(UL)UL.on(q==='ultra',w,h,R.getPixelRatio());
  sc.fog.far=q==='low'?230:380;const f=q==='low'?.5:1;tF.count=tK.count=tF2.count=Math.floor(NT*f);bV.forEach(m=>m.count=Math.floor(10*f));nCap=q==='low'?12:tr.length}
 
 /* day and night follow distance */
@@ -188,13 +191,13 @@ function step(dt){
  hornT-=dt;brk=!!(keys.KeyS||keys.ArrowDown||tp.b);
  const thr=!!(keys.KeyW||keys.ArrowUp||coarse),nit=!!(keys.ShiftLeft||keys.ShiftRight||tp.n)&&nitro>0&&thr&&!brk;
  const cap=Math.min(C.top,36+dist/60)+(nit?12:0);let a;
- if(brk)a=-46;else if(thr)a=C.acc*(nit?1.9:1)*Math.max(0,1-v/cap);else a=-(3+v*.025);
+ if(brk)a=-46;else if(thr)a=C.acc*(nit?1.9:1)*Math.max(0,1-v/cap);else a=-(3+v*.025+v*v*.0011);
  if(v>cap)a-=6;accl=a;v=cl(v+a*dt,0,cap+4);top=Math.max(top,v);
  if(nit){nitro=Math.max(0,nitro-24*dt);used+=24*dt;if(used>=95)api.unlock('burn');if(!tp.ns){tp.ns=1;api.sfx('nitro')}}else{tp.ns=0;nitro=Math.min(100,nitro+3*dt)}
  let gg=1;for(let i=0;i<GS.length;i++)if(v>=GS[i])gg=i+1;if(gg!==gear){gear=gg;api.sfx('gear')}
  const lo=GS[gear-1],hi=GS[gear]||C.top+4;rpm=.28+.72*cl((v-lo)/(hi-lo),0,1);EN.set(rpm,thr&&!brk?1:.2,v,vx,brk);
  const dir=((keys.KeyD||keys.ArrowRight||tp.r)?1:0)-((keys.KeyA||keys.ArrowLeft||tp.l)?1:0);
- const df=C.df||1;vx+=dir*(64+30*C.hd)*dt*cl(1.3-v/(105*df),.35,1);vx*=Math.exp(-(6.2+Math.min(v,80)*.02*df)*dt);px+=vx*dt;
+ const df=C.df||1;vx+=dir*(64+30*C.hd)*dt*cl(1.3-v/(105*df),.35,1);vx*=Math.exp(-(6.6+Math.min(v,80)*.014*df-(brk&&v>30?2.2:0))*dt);px+=vx*dt;
  const lim=7.2-P.wid/2-.1;if(Math.abs(px)>lim){px=cl(px,-lim,lim);vx=0;v*=1-.5*dt;shake=Math.max(shake,.25)}
  dist+=v*dt;if(ct>0){ct-=dt;if(ct<=0){combo=0;cbo.classList.remove('on')}}
  nAct=Math.min(nCap,8+(dist/500|0)*2);
@@ -216,11 +219,11 @@ function step(dt){
   o.d-=(v-o.s)*dt;
   if(o.d<-70||o.d>480){spawn(o,1);continue}
   if(o.pd>0&&o.d<=0){pass++;const gx=Math.abs(o.x-px)-(o.wid+P.wid)/2;if(gx>-.05&&gx<.9)near(o)}
-  if(Math.abs(o.d)<(o.len+P.len)/2-.25&&Math.abs(o.x-px)<(o.wid+P.wid)/2-.1){crash(o);return}}}
+  {const lo=(o.wid+P.wid)/2-.1-Math.abs(o.x-px);if(Math.abs(o.d)<(o.len+P.len)/2-.25&&lo>0){if(lo<(o.s<0?.25:.45)){const sg=px<o.x?-1:1;px+=sg*Math.min(lo,.12);vx=sg*Math.max(Math.abs(vx),3.5);v*=1-1.4*dt;shake=Math.max(shake,.5);if(!o.gz){o.gz=1;api.sfx('bump');api.unlock('graze')}}else{crash(o);return}}else o.gz=0}}}
 
 /* ---------- menus ---------- */
 function menu(){st='menu';paused=false;EN.stop();api.music('drive');cbo.classList.remove('on');hs.style.display=hr.style.display='none';
- ov(`<h3>Stellar Drive</h3><p>Pick a car and a mode.</p><div class="row"><button class="bt" data-a="cp" type="button">◀</button><b>${C.n}</b><button class="bt" data-a="cn" type="button">▶</button></div><div class="row"><button class="bt${M?'':' pri'}" data-a="m0" type="button">Free ride</button><button class="bt${M?' pri':''}" data-a="m1" type="button">Two-way</button></div><p>W or Up accelerates, S or Down brakes, A D or the arrows steer, Shift is nitro. C changes camera, H is the horn, L the headlights, P pauses, R restarts.</p><p>On a touch screen, hold the left or right side to steer and the middle to brake. Throttle is automatic.</p><button class="bt pri" data-a="go" type="button">Start (Space)</button>${api.strip(1)}<p>Best ${api.getBest('racer').toLocaleString()}</p>`)}
+ ov(`<h3>Stellar Drive</h3><p>Pick a car and a mode.</p><div class="row"><button class="bt" data-a="cp" type="button">◀</button><b>${C.n}</b><button class="bt" data-a="cn" type="button">▶</button></div><div class="row"><button class="bt${M?'':' pri'}" data-a="m0" type="button">Free ride</button><button class="bt${M?' pri':''}" data-a="m1" type="button">Two-way</button></div>${cfg.q==='ultra'?`<div class="row"><button class="bt" data-a="mp" type="button">Map: ${MAPN[mapSel]}</button></div>`:'<p>Set Graphics to Ultra for new maps, houses, a river and detailed trees.</p>'}<p>W or Up accelerates, S or Down brakes, A D or the arrows steer, Shift is nitro. C changes camera, H is the horn, L the headlights, P pauses, R restarts.</p><p>On a touch screen, hold the left or right side to steer and the middle to brake. Throttle is automatic.</p><button class="bt pri" data-a="go" type="button">Start (Space)</button>${api.strip(1)}<p>Best ${api.getBest('racer').toLocaleString()}</p>`)}
 function carStep(d){ci=(ci+d+CARS.length)%CARS.length;C=CARS[ci];buildP();menu()}
 function camTarget(){const x=px;switch(cm){case 0:return[x*.6,3,8.6,x*.35,1.2,-20,62];case 1:return[x*.5,5.8,14.5,x*.3,.9,-16,58];case 2:return[x,P.kind==='hyper'?1.02:1.32,-P.hz,x,1.2,-40,74];default:return[x,.62,-(P.len/2+.05),x,.7,-45,80]}}
 function start(){mode=M;buildP();road.material.map=roadTex(mode);road.material.needsUpdate=true;
@@ -231,11 +234,11 @@ function start(){mode=M;buildP();road.material.map=roadTex(mode);road.material.n
 function pause(on){if(st!=='run')return;paused=on;ov(on?`<h3>Paused</h3><div class="row"><button class="bt pri" data-a="res" type="button">Resume</button><button class="bt" data-a="go" type="button">Restart</button><button class="bt" data-a="menu" type="button">Car and mode</button><button class="bt" data-a="exit" type="button">Exit</button></div>${api.strip(1)}<p>Camera C, horn H, headlights L.</p>`:'');if(on)EN.stop();else EN.start(C.k)}
 
 /* ---------- drawing ---------- */
-function hud(){$('#sp').textContent=Math.round(v*3.6);$('#rp').style.width=rpm*100+'%';$('#ni').style.width=nitro+'%';$('#gr').textContent='Gear '+gear+'   Camera: '+CAMS[cm];$('#di').textContent=(dist/1000).toFixed(2)+' km';$('#sc').textContent=(Math.floor(dist/10)+bonus).toLocaleString()+' pts';$('#cn').textContent=combo>1?'Combo x'+combo:''}
+function hud(){$('#sp').textContent=Math.round(v*3.6);$('#rp').style.width=rpm*100+'%';$('#ni').style.width=nitro+'%';$('#gr').textContent='Gear '+gear+'   Camera: '+CAMS[cm]+(UL&&UL.live?'   Map: '+UL.name():'');$('#di').textContent=(dist/1000).toFixed(2)+' km';$('#sc').textContent=(Math.floor(dist/10)+bonus).toLocaleString()+' pts';$('#cn').textContent=combo>1?'Combo x'+combo:''}
 function draw(dt){
- env();road.material.map.offset.y=dist/10;ground.material.map.offset.y=dist/25;gan.position.z=60-(((240-dist)%900)+900)%900;
+ env();const ul=!!(UL&&UL.live);if(ul){UL.update(dist,dark,dt,time);if(st==='run'){const b=UL.bi();if(!(seen>>b&1)){seen|=1<<b;api.put('maps',seen);if(seen===31)api.unlock('globe')}}}tF.visible=tF2.visible=tK.visible=!ul;road.material.map.offset.y=dist/10;ground.material.map.offset.y=dist/25;gan.position.z=60-(((240-dist)%900)+900)%900;
  for(let k=0;k<tF.count;k++){const t=td[k],z=zf(t.z,420);D3.scale.set(t.sc,t.sc,t.sc);D3.position.set(t.s*t.x,3.6*t.sc+.6,z);D3.updateMatrix();tF.setMatrixAt(k,D3.matrix);D3.position.y=.9*t.sc;D3.updateMatrix();tK.setMatrixAt(k,D3.matrix);D3.position.y=6.4*t.sc;D3.updateMatrix();tF2.setMatrixAt(k,D3.matrix)}
- for(const b of bd){const m=bV[b.v];if(b.j>=m.count)continue;D3.scale.set(b.sx,b.sy,b.sx);D3.position.set(b.s*b.x,m.geometry.parameters.height*b.sy/2,zf(b.z,420));D3.updateMatrix();m.setMatrixAt(b.j,D3.matrix)}
+ for(const b of bd){const m=bV[b.v];if(b.j>=m.count)continue;const cs=ul&&!UL.city(b.z,420)?.001:1;D3.scale.set(b.sx*cs,b.sy*cs,b.sx*cs);D3.position.set(b.s*b.x,m.geometry.parameters.height*b.sy/2,zf(b.z,420));D3.updateMatrix();m.setMatrixAt(b.j,D3.matrix)}
  D3.scale.set(1,1,1);
  for(let k=0;k<NL;k++)for(let s=0;s<2;s++){const z=60-(((k*30-dist)%420)+420)%420,i=k*2+s,sx=s?1:-1;D3.position.set(sx*8.3,3.2,z);D3.updateMatrix();pl.setMatrixAt(i,D3.matrix);D3.position.set(sx*7.8,6.45,z);D3.updateMatrix();lh.setMatrixAt(i,D3.matrix)}
  for(const m of[tF,tF2,tK,pl,lh,...bV])m.instanceMatrix.needsUpdate=true;
@@ -243,7 +246,7 @@ function draw(dt){
  for(const o of tr)if(o.on){o.g.position.set(o.x,0,-o.d);const yw=(o.ch&&o.ch.k>0&&o.ch.k<1)?-(o.ch.x1-o.ch.x0)*.09*Math.sin(Math.PI*o.ch.k):0;o.g.rotation.y=(o.s<0?Math.PI:0)+yw;o.g.rotation.x=o.br?-.02:0;
   o.tail.color.setHex(o.br?0xff2020:dark>.4?0xa01414:0x5a0d0d);o.sl.color.setHex(o.sig<0&&blink?0xffa000:0x3a2200);o.sr.color.setHex(o.sig>0&&blink?0xffa000:0x3a2200);for(const w of o.wh)w.rotation.x-=Math.abs(o.s)/o.r*dt}
  if(st==='menu'){P.g.position.set(0,0,0);P.g.rotation.set(0,0,0)}
- else if(st==='run'){const kk=Math.min(1,dt*6);ps+=(cl(accl*.0009,-.04,.03)-ps)*kk;rs+=(-vx*.022-rs)*kk;P.g.position.set(px,Math.sin(time*53)*.006*cl(v/50,0,1),0);P.g.rotation.set(ps,-vx*.015,rs)}
+ else if(st==='run'){const kk=Math.min(1,dt*6);ps+=(cl(accl*.0013,-.07,.04)-ps)*kk;rs+=(-vx*.022-rs)*kk;P.g.position.set(px,Math.sin(time*53)*.006*cl(v/50,0,1),0);P.g.rotation.set(ps,-vx*.015,rs)}
  P.tail.color.setHex(brk&&st==='run'?0xff2020:dark>.4?0xa01414:0x5a0d0d);for(const w of P.wh)w.rotation.x-=v/P.r*dt;
  if(st==='menu'){cam.position.set(Math.sin(time*.45)*7.5,2.3,Math.cos(time*.45)*7.5);cam.lookAt(0,.8,0);cam.fov=48;cam.updateProjectionMatrix()}
  else{const t=camTarget(),k=1-Math.exp(-(cm>1?40:8)*dt);camPos.lerp(tv.set(t[0],t[1],t[2]),k);camLook.lerp(tl.set(t[3],t[4],t[5]),k);
@@ -253,7 +256,7 @@ function draw(dt){
  beam.position.x=px;beam.material.opacity=st!=='menu'&&(lights||dark>.45)?.22*(.4+.6*dark):0}
 function frame(t){raf=requestAnimationFrame(frame);const dt=Math.min((t-lt)/1000,.05);lt=t;time+=dt;
  if(!paused){if(st==='run')step(dt);else if(st==='crash'||st==='over')crashStep(dt)}
- draw(dt);if(st==='run'&&!paused&&(hudT-=dt)<=0){hudT=.1;hud()}R.render(sc,cam)}
+ draw(dt);if(st==='run'&&!paused&&(hudT-=dt)<=0){hudT=.1;hud()}if(UL&&UL.live)UL.render();else R.render(sc,cam)}
 
 /* ---------- input ---------- */
 const kd=e=>{keys[e.code]=true;if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code))e.preventDefault();if(e.repeat)return;
@@ -269,9 +272,9 @@ const pu=e=>{ptr.delete(e.pointerId);tp.n=false;zn()};
 ui.addEventListener('pointerdown',e=>{const t=e.target.dataset&&e.target.dataset.t;if(!t)return;if(t==='n')tp.n=true;else if(t==='c')camNext();else if(t==='h')horn()});
 ui.addEventListener('click',e=>{const a=e.target.closest('[data-a]');setTimeout(()=>document.activeElement&&document.activeElement.blur&&document.activeElement.blur(),0);if(!a)return;const k=a.dataset.a;
  if(k==='go')start();else if(k==='pause')pause(!paused);else if(k==='res')pause(false);else if(k==='menu')menu();else if(k==='exit')api.exit();
- else if(k==='cp')carStep(-1);else if(k==='cn')carStep(1);else if(k==='m0'||k==='m1'){M=+k[1];menu()}});
+ else if(k==='mp'){mapSel=(mapSel+1)%6;api.put('map',mapSel);if(UL)UL.map(mapSel);menu()}else if(k==='cp')carStep(-1);else if(k==='cn')carStep(1);else if(k==='m0'||k==='m1'){M=+k[1];menu()}});
 const vis=()=>{if(document.hidden)pause(true);lt=performance.now()};
 const off=api.on(applyG),ro=new ResizeObserver(applyG);ro.observe(root);
 addEventListener('keydown',kd);addEventListener('keyup',ku);root.addEventListener('pointerdown',pd);addEventListener('pointerup',pu);addEventListener('pointercancel',pu);document.addEventListener('visibilitychange',vis);
 applyG();menu();raf=requestAnimationFrame(frame);
-return()=>{cancelAnimationFrame(raf);off();ro.disconnect();removeEventListener('keydown',kd);removeEventListener('keyup',ku);root.removeEventListener('pointerdown',pd);removeEventListener('pointerup',pu);removeEventListener('pointercancel',pu);document.removeEventListener('visibilitychange',vis);R.dispose();R.forceContextLoss();api.music(null);EN.stop()}}
+return()=>{cancelAnimationFrame(raf);off();ro.disconnect();removeEventListener('keydown',kd);removeEventListener('keyup',ku);root.removeEventListener('pointerdown',pd);removeEventListener('pointerup',pu);removeEventListener('pointercancel',pu);document.removeEventListener('visibilitychange',vis);if(UL)UL.dispose();R.dispose();R.forceContextLoss();api.music(null);EN.stop()}}
