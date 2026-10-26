@@ -71,7 +71,7 @@ dialog h3{font:800 2.2rem/1 var(--d);text-transform:uppercase;margin:0 0 .4rem}.
 <p class="lead">Two games and a trophy case. Scores, settings and achievements save in this browser.</p>
 <div class="gm">
 <button class="gc" data-g="platformer" type="button"><i class="art a2"></i><b>Star Run</b><span>Side-scrolling platformer. Curated worlds up to level 19, then a level generator that never runs out and never builds an impossible jump.</span><em data-b="platformer"></em></button>
-<button class="gc" data-g="racer" type="button"><i class="art a3"></i><b>Stellar Drive</b><span>3D highway racing. Four cameras, nitro, one-way or two-way traffic, and drivers that brake, signal and change lanes. Ultra graphics adds five maps, houses, a river and detailed trees.</span><em data-b="racer"></em></button>
+<button class="gc" data-g="racer" type="button"><i class="art a3"></i><b>Stellar Drive</b><span>3D highway racing on winding, rolling roads. Five cars including a Toyota Supra, 25 kinds of traffic that brake, signal, yield and honk, six cameras, nitro, and an engine and horn that sound different on every model. Five maps, a living downtown and a weather cycle on every setting.</span><em data-b="racer"></em></button>
 </div>
 <div class="ah"><h2>Achievements</h2><span id="cnt"></span></div>
 <div class="pg"><i id="bar"></i></div>
@@ -79,7 +79,7 @@ dialog h3{font:800 2.2rem/1 var(--d);text-transform:uppercase;margin:0 0 .4rem}.
 </div>
 <div id="stage" hidden><div id="host"></div></div>
 <div class="tst" id="tst" aria-live="polite"></div>
-<dialog id="dlg"><h3>Settings</h3><p class="dm">Graphics apply to both games, resolution to Stellar Drive. Ultra adds five maps, houses, a river and detailed trees to the 3D game, and a lit, parallax look to Star Run.</p><div id="sp"></div><div class="row"><button class="pill" id="rs" type="button">Reset progress</button><button class="pill" id="cl" type="button">Close</button></div></dialog>
+<dialog id="dlg"><h3>Settings</h3><p class="dm">Graphics apply to both games, resolution to Stellar Drive. Ultra adds a lit, parallax look to Star Run. In Stellar Drive every setting has the same maps, buildings and weather, and each step up adds fidelity: shadows and reflections on High, bloom and lamp light on Ultra, film grading, sun shafts and rain on the lens on Stellar. The game also lowers its render resolution automatically if your device struggles. Star Run draws Stellar the same as Ultra.</p><div id="sp"></div><div class="row"><button class="pill" id="rs" type="button">Reset progress</button><button class="pill" id="cl" type="button">Close</button></div></dialog>
 <script type="module">
 const $=s=>document.querySelector(s),K='stellar-space-v2';
 let D={};try{D=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
@@ -108,13 +108,17 @@ hair:['≋','Hairline','Chain 8 near misses.','s'],
 red:['◉','Redline','Hit 250 km/h.','g'],
 wreck:['✸','Not covered','Crash above 200 km/h.','s',0,'Your insurer would like a word.'],
 wrong:['⇅','Wrong way, right thrill','Near-miss 10 oncoming cars in Two-way.','g',10],
-tour:['◎','Tourist','Try all four camera angles.','b'],
+tour:['◎','Tourist','Try four different camera angles.','b'],
 horn:['♪','Honk if you read this','Use the horn 10 times.','b',10,'Beep beep.'],
 burn:['▲','Burn it','Burn a full nitro tank in one run.','b'],
 haul:['→','Long haul','Drive 5 km in one run.','s'],
 dusk:['☼','Into the night','Drive until it gets dark.','s'],
-eye:['◐','Eye candy','Switch Graphics to Ultra.','b'],
-glow:['✦','Glow up','Play Star Run on Ultra graphics.','b'],
+eye:['◐','Eye candy','Switch Graphics to Ultra or Stellar.','b'],
+stel:['✧','Beyond Ultra','Switch Graphics to Stellar.','b'],
+supra:['Ⅳ','Mark Four','Take the Toyota Supra for a drive.','b'],
+storm:['ϟ','Eye of the storm','Drive through a thunderstorm on Stellar graphics.','s',0,'Some roads come with weather.'],
+pursuit:['◭','Hot pursuit','Keep a police car on your tail for 12 seconds.','s',0,'Some traffic has opinions about your speed.'],
+glow:['✦','Glow up','Play Star Run on Ultra or Stellar graphics.','b'],
 graze:['⌁','Paint swap','Scrape a car and keep driving.','b'],
 globe:['◍','Globetrotter','Drive through all five maps in Stellar Drive.','s',0,'There is more road than the meadow.'],
 rich:['$','Moneybags','Collect 500 coins in total.','s',500],
@@ -170,27 +174,27 @@ return`<li class="${on?'on ':''}${i===fresh?'new ':''}t-${tier}"><span class="ic
 function paintB(){$('[data-b=platformer]').textContent=D.b.platformer?'Furthest level cleared: '+D.b.platformer:'No level cleared yet';$('[data-b=racer]').textContent=D.b.racer?'Best score: '+D.b.racer.toLocaleString():'No run yet'}
 
 /* settings strip, reused inside the games */
-const CY={q:['low','med','high','ultra'],scale:[.5,.75,1,1.25,1.5]},LB={music:v=>'Music: '+(v?'on':'off'),sfx:v=>'Sound: '+(v?'on':'off'),q:v=>'Graphics: '+{low:'low',med:'medium',high:'high',ultra:'ultra'}[v],scale:v=>'Resolution: '+Math.round(v*100)+'%'};
+const CY={q:['low','med','high','ultra','stellar'],scale:[.5,.75,1,1.25,1.5]},LB={music:v=>'Music: '+(v?'on':'off'),sfx:v=>'Sound: '+(v?'on':'off'),q:v=>'Graphics: '+{low:'low',med:'medium',high:'high',ultra:'ultra',stellar:'stellar'}[v],scale:v=>'Resolution: '+Math.round(v*100)+'%'};
 const strip=g=>`<div class="strip">${['music','sfx',...(g===2?['q']:g?['q','scale']:[])].map(k=>`<button type="button" data-k="${k}">${LB[k](D.c[k])}</button>`).join('')}</div>`;
 const L=[];
 document.addEventListener('click',e=>{
 const b=e.target.closest('[data-k]');
-if(b){const k=b.dataset.k,c=CY[k];D.c[k]=c?c[(c.indexOf(D.c[k])+1)%c.length]:!D.c[k];save();A.apply();document.querySelectorAll('[data-k]').forEach(x=>x.textContent=LB[x.dataset.k](D.c[x.dataset.k]));L.forEach(f=>f());A.sfx('click');unlock('tune');if(D.c.q==='ultra')unlock('eye');return}
+if(b){const k=b.dataset.k,c=k==='q'&&cur==='platformer'?CY.q.slice(0,4):CY[k];D.c[k]=c?c[(c.indexOf(D.c[k])+1)%c.length]:!D.c[k];save();A.apply();document.querySelectorAll('[data-k]').forEach(x=>x.textContent=LB[x.dataset.k](D.c[x.dataset.k]));L.forEach(f=>f());A.sfx('click');unlock('tune');if(D.c.q==='ultra'||D.c.q==='stellar')unlock('eye');if(D.c.q==='stellar')unlock('stel');return}
 const g=e.target.closest('[data-g]');if(g)launch(g.dataset.g);
 if(e.target.closest('[data-x]'))exit()});
 $('#cfg').onclick=()=>{$('#sp').innerHTML=strip(1);$('#dlg').showModal()};$('#cl').onclick=()=>$('#dlg').close();
 $('#rs').onclick=()=>{if(confirm('Erase all achievements and scores?')){D.a={};D.s={};D.b={};save();paintA();paintB()}};
 
 /* game host */
-let stop=null;
+let stop=null,cur=null;
 const api={cfg:D.c,unlock,add,get:k=>D.s[k]||0,put:(k,v)=>{D.s[k]=v;save()},best(g,v){if(v>(D.b[g]||0)){D.b[g]=v;save();return true}return false},getBest:g=>D.b[g]||0,sfx:A.sfx,music:A.music,eng:A.eng,strip,on:f=>{L.push(f);return()=>{const i=L.indexOf(f);if(i>-1)L.splice(i,1)}},exit:()=>exit()};
 async function launch(n){
 $('#stage').hidden=false;document.body.style.overflow='hidden';const h=$('#host');h.innerHTML='<p class="ld">Loading…</p>';A.ctx();
 const hr=new Date().getHours();if(hr>=1&&hr<5)unlock('owl');
-D.s['p_'+n]=1;save();if(D.s.p_platformer&&D.s.p_racer)unlock('both');if(D.c.q==='ultra'){unlock('eye');if(n==='platformer')unlock('glow')}
+cur=n;D.s['p_'+n]=1;save();if(D.s.p_platformer&&D.s.p_racer)unlock('both');if(D.c.q==='ultra'||D.c.q==='stellar'){unlock('eye');if(n==='platformer')unlock('glow');if(D.c.q==='stellar'&&n==='racer')unlock('stel')}
 try{const m=await import('./'+n+'.js');h.innerHTML='';stop=await m.default(h,api)}
 catch(e){console.error(e);h.innerHTML='<p class="ld">This game could not load. Check your connection and try again.<button class="bt" data-x type="button">Back</button></p>'}}
-function exit(){try{stop&&stop()}catch(e){}stop=null;A.music(null);A.eng.stop();$('#host').innerHTML='';$('#stage').hidden=true;document.body.style.overflow='';paintA();paintB()}
+function exit(){try{stop&&stop()}catch(e){}stop=null;cur=null;A.music(null);A.eng.stop();$('#host').innerHTML='';$('#stage').hidden=true;document.body.style.overflow='';paintA();paintB()}
 paintA();paintB();unlock('s');
 </script>
 </body>
