@@ -161,7 +161,7 @@ function bg(){
   else if(ti===2){R(px,by-hg-14,9,hg+14,'rgba(10,14,40,.7)');for(let j=0;j<4;j++)if(((n+j)*7)&1)R(px+2,by-hg-10+j*7,2,2,'rgba(255,214,120,.8)')}
   else{X.fillStyle='rgba(255,120,40,.35)';X.beginPath();X.moveTo(px,by);X.lineTo(px+5,by-hg-10);X.lineTo(px+11,by);X.fill()}}}
 function draw(){
- const uq=api.cfg.q==='ultra';if(uq&&!U&&!ul){ul=1;import('./ultra2d.js').then(m=>{U=m.default(cv,X,VW,VH)}).catch(e=>{ul=2;console.warn('Ultra mode could not load',e)})}if(U)U.pre(uq);
+ const uq=api.cfg.q==='ultra'||api.cfg.q==='stellar';if(uq&&!U&&!ul){ul=1;import('./ultra2d.js').then(m=>{U=m.default(cv,X,VW,VH)}).catch(e=>{ul=2;console.warn('Ultra mode could not load',e)})}if(U)U.pre(uq);
  bg();if(U&&uq)U.far(cx,th,ti);
  if(g.length){
   const ox=Math.round(cx),sx=shk>.1?Math.round((Math.random()-.5)*shk):0,sy=shk>.1?Math.round((Math.random()-.5)*shk):0;X.save();X.translate(-ox+sx,sy);
