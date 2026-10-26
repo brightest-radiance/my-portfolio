@@ -1,4 +1,4 @@
-/* Stellar Drive Ultra: PS3-class pass. Branching procedural trees, houses, five maps, animated water, sky dome, clouds and bloom.
+/* Stellar Drive Ultra: PS3-class pass. (Water and beach are subdivided so they follow the winding road.) Branching procedural trees, houses, five maps, animated water, sky dome, clouds and bloom.
    Loaded on demand by racer.js when Graphics is set to Ultra. Bloom needs the import map in index.html (falls back to plain rendering). */
 export default async function(T,sc,R,cam,x){
 const{Group,Mesh,InstancedMesh,Color,Matrix4,Vector2,Vector3,Quaternion,Euler,BufferGeometry,Float32BufferAttribute,CylinderGeometry,IcosahedronGeometry,ConeGeometry,BoxGeometry,PlaneGeometry,SphereGeometry,MeshStandardMaterial,MeshBasicMaterial,ShaderMaterial,BackSide,CanvasTexture,RepeatWrapping,Sprite,SpriteMaterial,AdditiveBlending,WebGLRenderTarget,HalfFloatType}=T;
@@ -64,8 +64,8 @@ const wc=document.createElement('canvas');wc.width=wc.height=256;
  for(let b=0;b<256;b++)for(let a=0;a<256;a++){const dx=(H(a+1,b)-H(a-1,b))*4,dy=(H(a,b+1)-H(a,b-1))*4,n=Math.hypot(dx,dy,1),o=(b*256+a)*4;im.data[o]=128+127*dx/n;im.data[o+1]=128+127*dy/n;im.data[o+2]=128+127/n;im.data[o+3]=255}c.putImageData(im,0,0)}
 const wn=new CanvasTexture(wc);wn.wrapS=wn.wrapT=RepeatWrapping;wn.repeat.set(28,70);wn.anisotropy=8;
 const WTM=new MeshStandardMaterial({color:0x2a7da0,roughness:.05,metalness:.2,normalMap:wn,normalScale:new Vector2(.9,.9),transparent:true,opacity:.93,envMapIntensity:1.8});
-const water=new Mesh(new PlaneGeometry(260,900),WTM);water.rotation.x=-Math.PI/2;water.position.set(-186,.04,-250);
-const beach=new Mesh(new PlaneGeometry(9,900),new MeshStandardMaterial({color:0xd9c48f,roughness:1}));beach.rotation.x=-Math.PI/2;beach.position.set(-52.5,.02,-250);beach.receiveShadow=true;grp.add(water,beach);
+const water=new Mesh(new PlaneGeometry(260,900,1,150),WTM);water.rotation.x=-Math.PI/2;water.position.set(-186,.04,-250);
+const beach=new Mesh(new PlaneGeometry(9,900,1,150),new MeshStandardMaterial({color:0xd9c48f,roughness:1}));beach.rotation.x=-Math.PI/2;beach.position.set(-52.5,.02,-250);beach.receiveShadow=true;grp.add(water,beach);
 x.ENVM.push(WTM,VM);
 
 /* ---------- sky dome, sun and clouds ---------- */
@@ -73,13 +73,15 @@ const sky=new Mesh(new SphereGeometry(560,24,14),new ShaderMaterial({side:BackSi
  vertexShader:'varying float y;void main(){y=normalize(position).y;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
  fragmentShader:'uniform vec3 h,t;varying float y;void main(){gl_FragColor=vec4(mix(h,t,pow(clamp(y,0.,1.),.5)),1.);\n#include <tonemapping_fragment>\n#include <colorspace_fragment>\n}'}));sky.renderOrder=-10;sky.frustumCulled=false;grp.add(sky);
 const glow=(stops,sz)=>{const c=document.createElement('canvas');c.width=c.height=sz;const q=c.getContext('2d'),g=q.createRadialGradient(sz/2,sz/2,0,sz/2,sz/2,sz/2);stops.forEach(([o,s])=>g.addColorStop(o,s));q.fillStyle=g;q.fillRect(0,0,sz,sz);return new CanvasTexture(c)};
-const sunS=new Sprite(new SpriteMaterial({map:glow([[0,'rgba(255,255,255,1)'],[.12,'rgba(255,244,210,.95)'],[.35,'rgba(255,200,120,.28)'],[1,'rgba(255,170,90,0)']],256),transparent:true,depthWrite:false,fog:false,blending:AdditiveBlending}));sunS.scale.set(150,150,1);sunS.renderOrder=-9;grp.add(sunS);
-const SD=new Vector3(-.38,.4,-.84).normalize(),ctex=glow([[0,'rgba(255,255,255,.55)'],[1,'rgba(255,255,255,0)']],128);
-const clouds=[...Array(16)].map(()=>{const s=new Sprite(new SpriteMaterial({map:ctex,transparent:true,depthWrite:false,fog:false,opacity:.8}));s.scale.set(rnd(120,220),rnd(40,70),1);s.position.set(rnd(-300,300),rnd(110,190),rnd(-420,-150));grp.add(s);return s});
+const sunS=new Sprite(new SpriteMaterial({map:glow([[0,'rgba(255,255,255,1)'],[.15,'rgba(255,245,220,.95)'],[.35,'rgba(255,210,130,.25)'],[1,'rgba(255,180,90,0)']],256),transparent:true,depthWrite:false,fog:false,blending:AdditiveBlending}));sunS.scale.set(42,42,1);sunS.renderOrder=-9;grp.add(sunS);
+const SD=new Vector3(-.38,.4,-.84).normalize();
+const makeCloudTex=(sd)=>{const c=document.createElement('canvas');c.width=256;c.height=128;const q=c.getContext('2d'),r=rng(sd);for(let i=0;i<9;i++){const cx=45+r()*166,cy=40+r()*45,rad=22+r()*34;const g=q.createRadialGradient(cx,cy*1.08,rad*.1,cx,cy,rad);g.addColorStop(0,'rgba(255,255,255,.92)');g.addColorStop(.5,'rgba(245,248,255,.65)');g.addColorStop(.82,'rgba(220,230,245,.2)');g.addColorStop(1,'rgba(210,225,245,0)');q.fillStyle=g;q.beginPath();q.arc(cx,cy,rad,0,6.283);q.fill()}const tx=new CanvasTexture(c);tx.colorSpace=SRGBColorSpace;return tx};
+const cloudTexs=[makeCloudTex(101),makeCloudTex(203),makeCloudTex(307),makeCloudTex(409)];
+const clouds=[...Array(22)].map((_,i)=>{const tx=cloudTexs[i%cloudTexs.length],s=new Sprite(new SpriteMaterial({map:tx,transparent:true,depthWrite:false,fog:false,opacity:rnd(.6,.9)}));s.scale.set(rnd(110,240),rnd(48,95),1);s.position.set(rnd(-360,360),rnd(85,210),rnd(-460,-130));grp.add(s);return s});
 
 /* ---------- bloom, anti-aliased HDR target, ACES tone mapping ---------- */
 try{const[a,b,c,d]=await Promise.all(['EffectComposer','RenderPass','UnrealBloomPass','OutputPass'].map(n=>import(`three/addons/postprocessing/${n}.js`))),sz=R.getSize(new Vector2()),p=R.getPixelRatio();
- comp=new a.EffectComposer(R,new WebGLRenderTarget(1,1,{type:HalfFloatType,samples:4}));comp.setPixelRatio(p);comp.setSize(sz.x,sz.y);comp.addPass(new b.RenderPass(sc,cam));comp.addPass(new c.UnrealBloomPass(new Vector2(sz.x,sz.y),.42,.6,.88));comp.addPass(new d.OutputPass())}
+ const isMob=matchMedia('(pointer:coarse)').matches;comp=new a.EffectComposer(R,new WebGLRenderTarget(1,1,{type:HalfFloatType,samples:isMob?0:2}));comp.setPixelRatio(Math.min(p,1.5));comp.setSize(sz.x,sz.y);comp.addPass(new b.RenderPass(sc,cam));comp.addPass(new c.UnrealBloomPass(new Vector2(sz.x,sz.y),.22,.45,.95));comp.addPass(new d.OutputPass())}
 catch(e){comp=null;console.warn('Bloom unavailable, using plain rendering',e)}
 
 return{get live(){return live},
